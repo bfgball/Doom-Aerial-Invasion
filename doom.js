@@ -233,6 +233,7 @@ function mainMenu(){
 	}
 	createHighscores();
 	purge();
+	myGameArea.resize();
 
 }
 
