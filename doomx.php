@@ -177,6 +177,7 @@
 		}
 
 		preloadImages(js_resource, function(){
+			document.getElementById("progress").style.display = 'none';
 			startGame();;
 		});
 	</script>
