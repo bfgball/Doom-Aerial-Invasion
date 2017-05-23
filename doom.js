@@ -1741,6 +1741,8 @@ var player = function()
 			valueAfter = myGamePiece.armor;
 			valueGain = valueAfter - valueBefore;
 			createPickupMessage('Armor + ' + valueGain,x,y,'#99ccff');
+			myHUD.setState(0);
+			myHUD.updateMugshot();
 		}
 		if (item.doubleAmmo == true)
 		{
