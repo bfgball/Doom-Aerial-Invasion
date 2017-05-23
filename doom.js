@@ -3614,43 +3614,38 @@ function createHighscores()
 	x = myGameArea.canvas.width / 2 - 128;
 	y = myGameArea.canvas.height / 2 - 64;
 	offset = 0;
-	// for (var i = hscore_name.length - 1; i >= 0; i--) 
-	// {
-		// 	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-		// 	lastCreatedComponent.text = hscore_name[i] + ' - ' + hscore_score[i];
-		// 	offset += 32;
-		// 	console.log(hscore_name[i] + ' - ' + hscore_score[i]);
-		// }
-		highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-		lastCreatedComponent.text = 'Your last score is' + ' - ' + _score;
-		offset += 32;
-		highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-		lastCreatedComponent.text = 'Your last kill count is' + ' - ' + _killCount;
-		offset += 32;
-		highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
-		lastCreatedComponent.text = 'Your highest score is' + ' - ' + _hscore;
-		offset += 32;
-		highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
-		lastCreatedComponent.text = 'Your highest kill count is' + ' - ' + _hkillCount;
-	}
 
-	function everyinterval(n) {
-		if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-		return false;
-	}
 
-	function sound(src) {
-		this.sound = document.createElement("audio");
-		this.sound.src = src;
-		this.sound.setAttribute("preload", "auto");
-		this.sound.setAttribute("controls", "none");
-		this.sound.style.display = "none";
-		document.body.appendChild(this.sound);
-		this.play = function(){
-			this.sound.play();
-		}
-		this.stop = function(){
-			this.sound.pause();
-		}    
+	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your last score is' + ' - ' + _score;
+	offset += 32;
+	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your last kill count is' + ' - ' + _killCount;
+	offset += 32;
+	highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your highest score is' + ' - ' + _hscore;
+	offset += 32;
+	highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your highest kill count is' + ' - ' + _hkillCount;
+}
+
+function everyinterval(n) {
+	if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+	return false;
+}
+
+function sound(src) {
+	this.sound = document.createElement("audio");
+	this.sound.src = src;
+	this.sound.setAttribute("preload", "auto");
+	this.sound.setAttribute("controls", "none");
+	this.sound.style.display = "none";
+	document.body.appendChild(this.sound);
+	this.play = function(){
+		this.sound.play();
 	}
+	this.stop = function(){
+		this.sound.pause();
+	}    
+}
 
