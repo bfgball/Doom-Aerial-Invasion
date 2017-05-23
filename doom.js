@@ -1517,12 +1517,12 @@ var HUD = function()
 		myArmor.y =  myGamePiece.y + 64;
 		myArmorCounter.x = myGamePiece.x + 32;
 		myArmorCounter.y = myGamePiece.y + 64;
+	}
+	this.updateMugshot = function()
+	{
 		switch (this.state) {
 			case -1:
-			if (this.timer == 1)
-			{
-				this.HUD_suffix_2 = getRandomInt(0,2);
-			}
+			this.HUD_suffix_2 = getRandomInt(0,2);
 			if (myGamePiece.health>80) {
 				this.HUD_suffix_1 = "KIL0";            
 			} else if (myGamePiece.health>60){
@@ -1537,18 +1537,10 @@ var HUD = function()
 				this.HUD_suffix_1 = "DEAD";             
 				this.HUD_suffix_2 = "0"; 
 			}
-			if (this.timer >= 30)
-			{
-				this.setState(0);
-			}
 			break;
 
 			case 0:
-			if ((this.timer>getRandomInt(15,40)) && (myGamePiece.health>0)) {
-				this.HUD_suffix_2 = getRandomInt(0,2);
-				this.timer = 0;
-			}
-
+			this.HUD_suffix_2 = getRandomInt(0,2);
 			if (myGamePiece.health>80) {
 				this.HUD_suffix_1 = "ST0";            
 			} else if (myGamePiece.health>60){
@@ -1666,6 +1658,8 @@ var player = function()
 	{
 		updateTension();
 		this.isDead = true;
+		myHUD.updateMugshot();
+		myHUD.hidden = 100;
 		playsound('games/player/dspdiehi.mp3');            
 		myGamePiece.explode0(56, 56, "games/player/death.png",6,7,true);
 		myGamePiece.pauseFire == 99999;
@@ -1675,9 +1669,11 @@ var player = function()
 	this.pain = function()
 	{
 		updateTension();
+		
 		playsound('games/player/dsplpain.mp3');  
 		this.setState(-1, 'games/player/pain.png');
 		myHUD.setState(-1);
+		myHUD.updateMugshot();
 		myHUD.hidden = 100;
 		_pickupColor = '#ff0000';
 
@@ -1690,7 +1686,6 @@ var player = function()
 	}
 	this.eatItem = function(item)
 	{
-		updateTension();
 		valueBefore = 0;
 		valueAfter = 0;
 		valueGain = 0;
@@ -1720,6 +1715,9 @@ var player = function()
 			valueAfter = myGamePiece.health;
 			valueGain = valueAfter - valueBefore;
 			createPickupMessage('Health + ' + valueGain,x,y,'#99ff99');
+			myHUD.setState(0);
+			myHUD.updateMugshot();
+
 		}
 		if (item.armorMax > myGamePiece.armor && item.armorGive>0)
 		{
@@ -1865,6 +1863,7 @@ var player = function()
 
 		if (eaten == true)
 		{
+			updateTension();
 			playsound(item.pickupSound);
 		} else {
 			_pickupFlash = false;
@@ -3276,14 +3275,14 @@ function updateGameArea()
 				colorG = 'ff';
 				colorR = convert.dec2hex(Math.floor((2 - (hp*2))*255));		
 				if (colorR.length < 2){
-					colorR = '0' + colorR
+					colorR = '0' + colorR;
 				}
 			}
 			else if (hp <= 0.5 && hp > 0)
 			{
 				colorG = convert.dec2hex(Math.floor((hp*2)*255));
 				if (colorG.length < 2){
-					colorG = '0' + colorG
+					colorG = '0' + colorG;
 				}
 				colorR = 'ff';
 			} 
@@ -3657,5 +3656,4 @@ function sound(src) {
 		this.sound.pause();
 	}    
 }
-
 
