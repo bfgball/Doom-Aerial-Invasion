@@ -15,6 +15,7 @@ var _skull;
 var _cursorOffset;
 var _selectedMenu;
 var _menuItemMax;
+var _systemMessage;
 var _cursorCooldown = 0;
 var _menuCooldown = 0;
 var _nextEvent = -1;
@@ -46,6 +47,12 @@ var myMessage;
 var myHUD;
 var myArmor;
 var myArmorCounter;
+var myScouter;
+var scouterHidden;
+var scouterCheck = 0;
+
+var scouterTarget;
+
 var lastCreatedComponent;
 var lastCreatedSpecialEffect;
 var lastCreatedPickup;
@@ -67,6 +74,9 @@ var _windowWidth = 1000;
 var _windowHeight = 1000;
 var _killCount = 0;
 var _score = 0;
+
+var _hkillCount = 0;
+var _hscore = 0;
 var _monsterPreferenceMod = [
 //0 Army of Hell
 [40, 20, 3, 1],
@@ -115,6 +125,13 @@ function pixelExplosion1(number,color,x,y,angle,spread,speed)
 		angle0 = angle + ((Math.random() - 0.5) * spread)
 		pixel_list1.push(new pixel(color,x,y,speed0,getRandomFloat(0.9,1),angle0))
 	}
+}
+
+function showEnemyHP(target,x,y)
+{
+
+
+
 }
 
 
@@ -172,6 +189,7 @@ function startGame() {
 	_rank = new component(140, 20, "games/M_RANK.png", 0, 0, "image");
 	_help = new component(360, 240, "games/help.png", 0, 0, "image");
 	_skull = new component(20, 19, "games/M_SKULL.png", 0, 0, "image");
+	_systemMessage = new component("16px", "DooM", '#ffffff', 0, 0, "text");
 	_currentMenu = 0;
 	_selectedMenu = 0;
 	_maxPowerLevel = 0;
@@ -201,26 +219,23 @@ function mainMenu(){
 	delete myHealth;
 	delete myWeapon;
 	delete myAmmoCounter;
+	delete myScouter;
 	_cursorOffset = 64;
 	_currentMenu = 2;
 	_selectedMenu = 2;
+	if (_score > _hscore)
+	{
+		_hscore = _score;
+	}
+	if (_killCount > _hkillCount)
+	{
+		_hkillCount = _killCount;
+	}
 	createHighscores();
 	purge();
 
-	createCookie("score", _score);
 }
 
-function createCookie(name, value) {
-	var expires;
-	if (days) {
-		var date = new Date();
-		date.setTime(date.getTime() + (60 * 1000));
-		expires = "; expires=" + date.toGMTString();
-	} else {
-		expires = "";
-	}
-	document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
-}
 
 
 function purge(){
@@ -283,11 +298,39 @@ function checkEvent()
 
 				case 2:
 				monsters_list.push(new cardinal(104,104,'games/card/idle.png', myGameArea.canvas.width/2,-64,'image'));
+				lastCreatedMonster.width = 80;
+				lastCreatedMonster.height = 90;
 				playsound('games/card/dscybsit.wav');
 				_powerLevel = _powerLevel + 10000;
 				break;
 				default:
 				// statements_def
+				break;
+
+				case 3:
+				_systemMessage.text = 'Congratulations!'
+				_monsterSpawnCooldown = 99999;
+				_nextEvent = 4;
+				_eventCooldown = 150;
+				break;
+
+				case 4:
+				_systemMessage.text = 'Once again, the armies of hell is wrecked.'
+				_nextEvent = 5;
+				_eventCooldown = 300;
+				break;
+
+				case 5:
+				_systemMessage.text = 'You have successfully defended earth from the alien invasion!'
+				_nextEvent = 6;
+				_eventCooldown = 300;
+				break;
+
+				case 6:
+				_systemMessage.text = 'Thanks for playing!'
+				_systemMessage.color = '#ffff00'
+				_nextEvent = 1;
+				_eventCooldown = 300;
 				break;
 			}
 		}
@@ -314,10 +357,16 @@ function loadLevel(level)
 		myHealth = new component("16px", "mortis", "#99ff99", 0, 0, "text");
 		myAmmoCounter = new component("16px", "mortis", "yellow", 0, 0, "text");
 		myWeapon = new component(80, 36, "games/player/Pistol.png", 0, 0, "image");
+		myScouter = new component("16px", "mortis", "#888800", 0, 0, "text");
 		myMessage = new component("18px", "mortis", "red", 0, 0, "text");
 		myHUD = new HUD(24, 30, "games/hud/STFST00.png", 0, 0, "image");
 		myArmor = new component(31, 17, "games/null.png", 0, 0, "image");
 		myArmorCounter = new component("16px", "mortis", "cyan", 0, 0, "text");
+		delete _systemMessage.text;
+
+		//monsters_list.push(new cardinal(104,104,'games/card/idle.png', myGameArea.canvas.width/2,-64,'image'));
+
+
 		_gameState = 1;
 		_spawnSet = 0;
 		_monsterSpawnCooldown = 0;
@@ -1006,6 +1055,9 @@ var myGameArea =
 		_ground2.y = this.canvas.height / 2;
 		_ground2.imageWidth = this.canvas.width;
 		_ground2.imageHeight = this.canvas.height;
+
+		_systemMessage.x =  this.canvas.width / 2 - 256;
+		_systemMessage.y =  this.canvas.height / 2;		
 		console.log('NEW WIDTH ' + this.canvas.width + ' / ' + document.body.clientWidth);
 		console.log('NEW HEIGHT ' + this.canvas.height + ' / ' + document.body.clientHeight);
 
@@ -1143,6 +1195,7 @@ function component(width, height, color, x, y, type)
 	this.state = 0;
 	this.timer = 0;
 	this.health = 100;
+	this.maxhealth = 100;
 	this.armor = 0;
 	this.save = 0;
 	this.isDead = false;
@@ -1536,6 +1589,8 @@ var player = function()
 	this.usingAmmo = false;
 	this.pauseFire = 0;
 	this.runSpeed = 0;
+	this.speed = 0.5;
+	this.weaponSwitchCooldown = 0;
 	this.painChance = 101;
 	this.weapon = [         'Pistol','Shotgun','SuperShotgun','Chaingun','RocketLauncher','PlasmaRifle','BFG9000','BFG10K'];
 	this.ammo = [                 -1,       0,             0,         0,            0,           0,       0,       0];
@@ -1581,6 +1636,33 @@ var player = function()
 		myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
 		playsound('games/player/' + this.weaponSwitchSound[index] + '.wav');
 		this.weaponHidden = 50;
+	}
+	this.player_quickSwitch = function(index)
+	{
+		if (this.currentWeapon == index)
+		{
+			return false;        
+		}
+		else if (this.weaponAvailable[index] == false)
+		{
+			return false;
+		}
+		else if ((this.ammo[index] < this.weaponAmmoUse[index]) && (this.ammo[index] != -1))
+		{
+			return false;
+		}
+		else if (this.weaponState != 0)
+		{
+			return false;
+		}
+		this.weaponSwitchCooldown = 20;
+		this.weaponState = 0;
+		this.usingAmmo = false;
+		this.currentWeapon = index;
+		myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
+		playsound('games/player/' + this.weaponSwitchSound[index] + '.wav');
+		this.weaponHidden = 50;
+		return true;
 	}
 	this.death = function()
 	{
@@ -1985,6 +2067,7 @@ var player = function()
 		if (this.weaponHidden> -1) {this.weaponHidden -= 1;}
 		if (this.pauseFire> -1) {this.pauseFire -= 1;}
 		if (this.messageHidden> -1) {this.messageHidden -= 1;}
+		if (this.weaponSwitchCooldown> -1) {this.weaponSwitchCooldown -= 1;}
 		this.timer = this.timer + 1;
 		if (this.tracerAttackNextFrame == true)
 		{
@@ -2190,6 +2273,7 @@ var cacodemon = function()
 	this.deathSound = "games/head/dscacdth.wav";
 	this.friction = 0.9;
 	this.health = 300;
+	this.maxhealth = 300;
 	this.mass = 40;
 	this.painChance = 35;
 	this.frameLength = 5;
@@ -2320,7 +2404,8 @@ var lostsoul = function(){
 	monsters.apply(this,arguments);
 	this.deathSound = "games/dsfirxpl.wav";
 	this.friction = getRandomFloat(0.85,0.95);
-	this.health = 50
+	this.health = 50;
+	this.maxhealth = 50;
 	this.mass = 10;
 	this.frameLength = 6;
 	this.damage = 4;
@@ -2450,7 +2535,8 @@ var afrit = function(){
 	monsters.apply(this,arguments);
 	this.deathSound = "games/afrit/dsbrsdth.wav";
 	this.friction = 0.85;
-	this.health = 1000
+	this.health = 1000;
+	this.maxhealth = 1000;
 	this.mass = 1000;
 	this.frameLength = 8;
 	this.painChance = 12;
@@ -2614,6 +2700,7 @@ var painElemental = function() {
 	monsters.apply(this,arguments);
 	this.friction = 0.8;
 	this.health = 300;
+	this.maxhealth = 300;
 	this.mass = 40;
 	this.painChance = 35;
 	this.frameLength = 8;
@@ -2727,6 +2814,7 @@ var cardinal = function()
 	monsters.apply(this,arguments);
 	this.friction = 0.9;
 	this.health = 4000;
+	this.maxhealth = 4000;
 	this.mass = 2000;
 	this.painChance = 5;
 	this.frameLength = 6;
@@ -2735,7 +2823,12 @@ var cardinal = function()
 	this.attackRemain = 0;
 	this.explode = function()
 	{
-		this.explode0(140,140,"games/card/death.png",6,8,true);
+		myGamePiece.health = 200;
+		myGamePiece.armor = 200;
+		this.explode0(140,140,"games/card/death.png",8,8,true);
+		_score += 50000;
+		_nextEvent = 3;
+		_eventCooldown = 100;
 	}
 	this.pain = function()
 	{
@@ -2991,7 +3084,8 @@ revenantMissile.prototype.constructor = revenantMissile;
 
 var monsterRocket = function() {
 	monsterBall.apply(this,arguments);
-	this.damage = 20;
+	this.damage = 10;
+	//cause u are a bunch of nuuuuubbbbbb lololol haha xdxd
 	this.dice = 8;
 	this.state = 1;
 	this.friction = 0.95;
@@ -3051,6 +3145,14 @@ function updateGameArea()
 				{
 					missiles_list[i].harm(monsters_list[j]);
 					_score += Math.floor(lastDamageTaken);
+
+					if (scouterCheck == 0 && monsters_list[j].maxhealth > 100)
+					{
+						scouterTarget = monsters_list[j];
+						scouterHidden = Math.floor(Math.sqrt(lastDamageTaken) + 10);
+						scouterCheck = 1;
+					}
+
 					missiles_list[i].explode();
 					missiles_list[i].death();
 				}
@@ -3109,15 +3211,19 @@ function updateGameArea()
 
 		myGameArea.flash();
 
+		if (_systemMessage.text)
+		{
+			_systemMessage.update();
+		}
 
 		myGamePiece.accelerationX = 0;
 		myGamePiece.accelerationY = 0;          
 		myGamePiece.isFiring = false;
 
-		if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[65])) {myGamePiece.accelerationX = -0.5; }
-		if (myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[68])) {myGamePiece.accelerationX = 0.5; }
-		if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) {myGamePiece.accelerationY= -0.5; }
-		if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) {myGamePiece.accelerationY= 0.5; }
+		if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[65])) {myGamePiece.accelerationX = -myGamePiece.speed; }
+		if (myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[68])) {myGamePiece.accelerationX = myGamePiece.speed; }
+		if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) {myGamePiece.accelerationY= -myGamePiece.speed; }
+		if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) {myGamePiece.accelerationY= myGamePiece.speed; }
 
 		if (myGameArea.keys && (myGameArea.keys[16] || myGameArea.keys[13])) {myGamePiece.isFiring = true; }
 
@@ -3130,12 +3236,76 @@ function updateGameArea()
 		if (myGameArea.keys && myGameArea.keys[55]) {myGamePiece.player_switch(6); }
 		if (myGameArea.keys && myGameArea.keys[56]) {myGamePiece.player_switch(7); }
 
+		if (myGameArea.keys && myGameArea.keys[69]) {
+			if (myGamePiece.weaponSwitchCooldown <= 0)
+			{
+				i = 1;
+				j = myGamePiece.currentWeapon + i;
+				if (j>7) {j-=7};
+				while (myGamePiece.player_quickSwitch(j) == false && i < 6) {
+					i++;
+					j = myGamePiece.currentWeapon + i;
+					if (j>7) {j-=7};
+				}
+			}
+		} 
+		else if (myGameArea.keys && myGameArea.keys[81]) {
+			if (myGamePiece.weaponSwitchCooldown <= 0)
+			{
+				i = -1;
+				j = myGamePiece.currentWeapon + i;
+				if (j<0) {j+=7};
+				while (myGamePiece.player_quickSwitch(j) == false && i > -6) {
+					i--;
+					j = myGamePiece.currentWeapon + i;
+					if (j<0) {j+=7};
+				}
+			}
+		} else 
+		{
+			myGamePiece.weaponSwitchCooldown = 0;
+		}
+
 		myHealth.text = myGamePiece.health;
 		myScore.update();
 		myLuck.update();
 		myPowerLevel.update();
 		myKill.update();
 		myDmg.update();
+		if (scouterCheck>0 && scouterTarget) {
+			myScouter.text = Math.floor(scouterTarget.health);
+
+			hp = scouterTarget.health / scouterTarget.maxhealth;
+			console.log(hp);
+			if (hp > 0.5)
+			{
+				colorG = 'ff';
+				colorR = convert.dec2hex(Math.floor((2 - (hp*2))*255));			
+			}
+			else if (hp <= 0.5)
+			{
+				colorG = convert.dec2hex(Math.floor((hp*2)*255));
+				colorR = 'ff';
+			} 
+			else if (hp < 0)
+			{
+				colorG = 'ff';
+				colorR = 'ff';
+			}
+			console.log('#' + colorR + colorG + '00');
+			myScouter.color = '#' + colorR + colorG + '00';
+			myScouter.x = scouterTarget.x;
+			myScouter.y = scouterTarget.y + Math.ceil(scouterTarget.height / 2 + 16);
+			scouterCheck = 0;
+		}
+
+
+		if (scouterHidden > 0)
+		{
+			myScouter.update();
+			scouterHidden -= 1;
+		}
+
 		if (myHUD.hidden > 0) {
 			myHUD.update();
 			if (myGamePiece.armor > 0)
@@ -3185,9 +3355,9 @@ function updateGameArea()
 
 			_difficult = Math.floor(myGameArea.frameNo / 200) + 10;
 			spawnMonster();
-
 		}
-	} else if(_gameState == 0)
+	} 
+	else if(_gameState == 0)
 	{
 		switch (_currentMenu) {
 			case 0:
@@ -3442,36 +3612,45 @@ function updateGameArea()
 function createHighscores()
 {
 	x = myGameArea.canvas.width / 2 - 128;
-	y = myGameArea.canvas.height / 2 - 128;
+	y = myGameArea.canvas.height / 2 - 64;
 	offset = 0;
 	// for (var i = hscore_name.length - 1; i >= 0; i--) 
 	// {
-	// 	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-	// 	lastCreatedComponent.text = hscore_name[i] + ' - ' + hscore_score[i];
-	// 	offset += 32;
-	// 	console.log(hscore_name[i] + ' - ' + hscore_score[i]);
-	// }
-	highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
-	lastCreatedComponent.text = 'Your last score is' + ' - ' + _score;
-}
-
-function everyinterval(n) {
-	if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-	return false;
-}
-
-function sound(src) {
-	this.sound = document.createElement("audio");
-	this.sound.src = src;
-	this.sound.setAttribute("preload", "auto");
-	this.sound.setAttribute("controls", "none");
-	this.sound.style.display = "none";
-	document.body.appendChild(this.sound);
-	this.play = function(){
-		this.sound.play();
+		// 	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+		// 	lastCreatedComponent.text = hscore_name[i] + ' - ' + hscore_score[i];
+		// 	offset += 32;
+		// 	console.log(hscore_name[i] + ' - ' + hscore_score[i]);
+		// }
+		highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+		lastCreatedComponent.text = 'Your last score is' + ' - ' + _score;
+		offset += 32;
+		highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+		lastCreatedComponent.text = 'Your last kill count is' + ' - ' + _killCount;
+		offset += 32;
+		highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
+		lastCreatedComponent.text = 'Your highest score is' + ' - ' + _hscore;
+		offset += 32;
+		highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
+		lastCreatedComponent.text = 'Your highest kill count is' + ' - ' + _hkillCount;
 	}
-	this.stop = function(){
-		this.sound.pause();
-	}    
-}
+
+	function everyinterval(n) {
+		if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+		return false;
+	}
+
+	function sound(src) {
+		this.sound = document.createElement("audio");
+		this.sound.src = src;
+		this.sound.setAttribute("preload", "auto");
+		this.sound.setAttribute("controls", "none");
+		this.sound.style.display = "none";
+		document.body.appendChild(this.sound);
+		this.play = function(){
+			this.sound.play();
+		}
+		this.stop = function(){
+			this.sound.pause();
+		}    
+	}
 
