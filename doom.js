@@ -300,7 +300,7 @@ function checkEvent()
 				monsters_list.push(new cardinal(104,104,'games/card/idle.png', myGameArea.canvas.width/2,-64,'image'));
 				lastCreatedMonster.width = 80;
 				lastCreatedMonster.height = 90;
-				playsound('games/card/dscybsit.wav');
+				playsound('games/card/dscybsit.mp3');
 				_powerLevel = _powerLevel + 10000;
 				break;
 				default:
@@ -789,7 +789,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/Shotgun.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 1; 
 				lastCreatedPickup.shellsGive = 12;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 2:
@@ -800,7 +800,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/SuperShotgun.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 2; 
 				lastCreatedPickup.shellsGive = 24;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 3:
@@ -811,7 +811,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/Chaingun.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 3; 
 				lastCreatedPickup.bulletGive = 100;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 4:
@@ -822,7 +822,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/RocketLauncher.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 4; 
 				lastCreatedPickup.rocketGive = 10;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 5:
@@ -833,7 +833,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/PlasmaRifle.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 5; 
 				lastCreatedPickup.cellsGive = 50;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 6:
@@ -844,7 +844,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/BFG9000.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 6; 
 				lastCreatedPickup.cellsGive = 100;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 7:
@@ -855,7 +855,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(80, 36, "games/player/BFG10K.png", x, y,'image'));
 				lastCreatedPickup.weaponGive = 7; 
 				lastCreatedPickup.DcellsGive = 20;
-				lastCreatedPickup.pickupSound = 'games/items/dswpnup.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dswpnup.mp3';
 			}
 			break;
 			case 8:
@@ -932,7 +932,7 @@ function deathDrop(rarity,x,y,chance)
 				pickup_list.push(new pickup(25, 25, "games/items/SOULA0.png", x, y,'image'));
 				lastCreatedPickup.healthGive = 100; 
 				lastCreatedPickup.healthMax = 200; 
-				lastCreatedPickup.pickupSound = 'games/items/dsgetpow.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dsgetpow.mp3';
 			}
 			break;
 			case 16:
@@ -946,7 +946,7 @@ function deathDrop(rarity,x,y,chance)
 				lastCreatedPickup.armorGive = 200; 
 				lastCreatedPickup.armorMax = 200; 
 				lastCreatedPickup.armorSave = 0.5; 
-				lastCreatedPickup.pickupSound = 'games/items/dsgetpow.wav';
+				lastCreatedPickup.pickupSound = 'games/items/dsgetpow.mp3';
 			}
 			break;
 			case 17:
@@ -1632,7 +1632,7 @@ var player = function()
 		this.usingAmmo = false;
 		this.currentWeapon = index;
 		myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
-		playsound('games/player/' + this.weaponSwitchSound[index] + '.wav');
+		playsound('games/player/' + this.weaponSwitchSound[index] + '.mp3');
 		this.weaponHidden = 50;
 	}
 	this.player_quickSwitch = function(index)
@@ -1658,7 +1658,7 @@ var player = function()
 		this.usingAmmo = false;
 		this.currentWeapon = index;
 		myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
-		playsound('games/player/' + this.weaponSwitchSound[index] + '.wav');
+		playsound('games/player/' + this.weaponSwitchSound[index] + '.mp3');
 		this.weaponHidden = 50;
 		return true;
 	}
@@ -1666,7 +1666,7 @@ var player = function()
 	{
 		updateTension();
 		this.isDead = true;
-		playsound('games/player/dspdiehi.wav');            
+		playsound('games/player/dspdiehi.mp3');            
 		myGamePiece.explode0(56, 56, "games/player/death.png",6,7,true);
 		myGamePiece.pauseFire == 99999;
 		_nextEvent = 1;
@@ -1675,7 +1675,7 @@ var player = function()
 	this.pain = function()
 	{
 		updateTension();
-		playsound('games/player/dsplpain.wav');  
+		playsound('games/player/dsplpain.mp3');  
 		this.setState(-1, 'games/player/pain.png');
 		myHUD.setState(-1);
 		myHUD.hidden = 100;
@@ -1886,7 +1886,7 @@ var player = function()
 			lastCreatedComponent.dice = 3;        
 			pixelExplosion(3,'#ffffcc',this.x,this.y-16,this.angle,0.3,5);
 			this.cooldown = 15;
-			playsound('games/player/DSTPFIR.wav');
+			playsound('games/player/DSTPFIR.mp3');
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1903,7 +1903,7 @@ var player = function()
 			}
 			pixelExplosion(15,'#ffffcc',this.x,this.y-16,this.angle,0.5,7);
 			this.cooldown = 50;
-			playsound('games/player/DS12GFIR.wav');
+			playsound('games/player/DS12GFIR.mp3');
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1920,7 +1920,7 @@ var player = function()
 			}
 			pixelExplosion(25,'#ffffcc',this.x,this.y-16,this.angle,0.6,9);
 			this.cooldown = 75;
-			playsound('games/player/DSDSHTGN.wav');
+			playsound('games/player/DSDSHTGN.mp3');
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1929,7 +1929,7 @@ var player = function()
 			switch (this.weaponState) 
 			{
 				case 0:
-				playsound('games/player/DSMINSTA.wav');
+				playsound('games/player/DSMINSTA.mp3');
 				this.cooldown = 15;
 				this.holdFire = true;
 				this.weaponState = 1;
@@ -1937,7 +1937,7 @@ var player = function()
 				break;
 				case 1:
 				this.usingAmmo = true;
-				playsound('games/player/DSMINI1.wav');
+				playsound('games/player/DSMINI1.mp3');
 				pixelExplosion(3,'#ffffcc',this.x,this.y-16,this.angle,0.35,10);
 				this.cooldown = 5;
 				missiles_list.push(new tracer(64, 64, "games/player/tracer.png", this.x, this.y,'image'));
@@ -1957,7 +1957,7 @@ var player = function()
 				break;
 				case 2:
 				this.holdFire = false;
-				playsound('games/player/DSMINSTO.wav');
+				playsound('games/player/DSMINSTO.mp3');
 				this.cooldown = 15;
 				this.weaponState = 0;
 				break;
@@ -1975,7 +1975,7 @@ var player = function()
 			lastCreatedComponent.dice = 8;
 			pixelExplosion(10,'#ff6666',this.x,this.y-16,this.angle,0.25,15);
 			this.cooldown = 27;
-			playsound('games/player/DSRLFIRE.wav');
+			playsound('games/player/DSRLFIRE.mp3');
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1990,7 +1990,7 @@ var player = function()
 			lastCreatedComponent.dice = 8;
 			pixelExplosion(2,'#3399ff',this.x,this.y-16,this.angle,0.3,12);
 			this.cooldown = 4;
-			playsound('games/player/DSPLAS2.wav');
+			playsound('games/player/DSPLAS2.mp3');
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -2002,7 +2002,7 @@ var player = function()
 				this.cooldown = 30;
 				this.holdFire = true;
 				this.weaponState = 1;
-				playsound('games/player/dsbfg.wav');
+				playsound('games/player/dsbfg.mp3');
 				this.setState(1 , "games/player/fire.png")
 				break;
 				case 1:
@@ -2028,12 +2028,12 @@ var player = function()
 			lastCreatedComponent.width = 8;
 			lastCreatedComponent.height = 32;
 			lastCreatedComponent.angle = this.angle;
-			lastCreatedComponent.deathSound = 'games/player/dbfgex2.wav';
+			lastCreatedComponent.deathSound = 'games/player/dbfgex2.mp3';
 			lastCreatedComponent.damage = 25;
 			lastCreatedComponent.dice = 8;    
 			pixelExplosion(5,'#0099ff',this.x,this.y-16,this.angle,0.3,20);    
 			this.cooldown = 10;
-			playsound('games/player/dbfgfir2.wav');
+			playsound('games/player/dbfgfir2.mp3');
 			this.setState(1 , "games/player/fire2.png")
 			break;
 		}
@@ -2187,7 +2187,7 @@ var rocket = function()
 	this.explode = function()
 	{
 		this.splashDamage(144,144);
-		playsound('games/dxbarexp.wav');
+		playsound('games/dxbarexp.mp3');
 		this.explode0(103,86,"games/explode.png",6,3);
 		pixelExplosion1(10,'#ffffcc',this.x,this.y,this.angle,6.28,10);
 	}
@@ -2215,7 +2215,7 @@ var plasma = function()
 	missile.apply(this,arguments);
 	this.explode = function()
 	{
-		playsound('games/dsfirxpl.wav');
+		playsound('games/dsfirxpl.mp3');
 		this.explode0(39,41,"games/player/plexp.png",5,4);
 		pixelExplosion1(5,'#99ccff',this.x,this.y,this.angle,6.28,6);
 	}
@@ -2228,7 +2228,7 @@ var bfgball = function()
 	missile.apply(this,arguments);
 	this.explode = function()
 	{
-		playsound('games/player/dsrxplod.wav');
+		playsound('games/player/dsrxplod.mp3');
 		this.explode0(143,114,"games/player/bfgx2.png",6,6);
 		pixelExplosion1(20,'#99ff99',this.x,this.y,this.angle,6.28,7);
 		myGamePiece.tracerAttackNextFrame = true;
@@ -2268,7 +2268,7 @@ monsters.prototype.constructor = monsters;
 var cacodemon = function()
 {
 	monsters.apply(this,arguments);
-	this.deathSound = "games/head/dscacdth.wav";
+	this.deathSound = "games/head/dscacdth.mp3";
 	this.friction = 0.9;
 	this.health = 300;
 	this.maxhealth = 300;
@@ -2283,7 +2283,7 @@ var cacodemon = function()
 	}
 	this.pain = function()
 	{
-		playsound("games/head/dsdmpain.wav");
+		playsound("games/head/dsdmpain.mp3");
 		this.setState(-1,'games/head/pain.png')    
 	}
 	this.monster_update = function()
@@ -2346,7 +2346,7 @@ var cacodemon = function()
 			case 1:
 			if (this.timer == 10)
 			{ 
-				playsound('games/head/dscacsit.wav');
+				playsound('games/head/dscacsit.mp3');
 				this.setState(2,'games/head/attack2.png');
 			}
 			break;
@@ -2354,7 +2354,7 @@ var cacodemon = function()
 			case 2:
 			if (this.timer == 60)
 			{
-				playsound('games/head/dsfwoosh.wav');
+				playsound('games/head/dsfwoosh.mp3');
 				this.setState(3);
 				monsterball_list.push(new cacodemonBall(11, 49, "games/head/fireball.png", this.x, this.y,'image'));     
 				lastCreatedComponent.speedY = 32;
@@ -2400,7 +2400,7 @@ cacodemon.prototype.constructor = cacodemon;
 
 var lostsoul = function(){
 	monsters.apply(this,arguments);
-	this.deathSound = "games/dsfirxpl.wav";
+	this.deathSound = "games/dsfirxpl.mp3";
 	this.friction = getRandomFloat(0.85,0.95);
 	this.health = 50;
 	this.maxhealth = 50;
@@ -2418,7 +2418,7 @@ var lostsoul = function(){
 	}
 	this.pain = function()
 	{
-		playsound("games/head/dsdmpain.wav");
+		playsound("games/head/dsdmpain.mp3");
 		this.setState(-1,'games/soul/pain.png') 
 	}
 	this.monster_update = function()
@@ -2489,7 +2489,7 @@ var lostsoul = function(){
 			case 1:
 			if (this.timer >= 5)
 			{ 
-				playsound('games/soul/dssklatk.wav');
+				playsound('games/soul/dssklatk.mp3');
 				this.setState(2)
 				this.chargeAt(myGamePiece,getRandomInt(5,20)+(myGameArea.canvas.height/100),Math.random());   
 				this.timer = getRandomInt(Math.floor(-0.1*_difficult),25)
@@ -2531,7 +2531,7 @@ lostsoul.prototype.constructor = lostsoul;
 
 var afrit = function(){
 	monsters.apply(this,arguments);
-	this.deathSound = "games/afrit/dsbrsdth.wav";
+	this.deathSound = "games/afrit/dsbrsdth.mp3";
 	this.friction = 0.85;
 	this.health = 1000;
 	this.maxhealth = 1000;
@@ -2547,7 +2547,7 @@ var afrit = function(){
 	}
 	this.pain = function()
 	{
-		playsound("games/head/dsdmpain.wav");
+		playsound("games/head/dsdmpain.mp3");
 		this.setState(-1,'games/afrit/pain.png');
 	}
 	this.monster_update = function()
@@ -2596,7 +2596,7 @@ var afrit = function(){
 				if (rnd < _difficult / 40 + 5 && this.state == 0)
 				{
 					this.setState(1,'games/afrit/attack1.png')
-					playsound('games/afrit/dsbrssit.wav')
+					playsound('games/afrit/dsbrssit.mp3')
 					this.frameLength = 6;
 					this.targetRange = this.targetRange + (Math.random()*2000);
 					this.speedX = this.speedX * Math.random();
@@ -2630,8 +2630,8 @@ var afrit = function(){
 			case 2:
 			if (this.timer >= 14)
 			{
-				playsound('games/afrit/dsfirsht.wav');
-				playsound('games/afrit/dsskeatk.wav');
+				playsound('games/afrit/dsfirsht.mp3');
+				playsound('games/afrit/dsskeatk.mp3');
 				this.setState(0,'games/afrit/idle.png'); 
 				angl = -1;
 				for (var z = 0; z < 3; z++) {
@@ -2687,7 +2687,7 @@ var painSpawner = function()
 				_powerLevel += lastCreatedMonster.powerLevel;
 				lastCreatedComponent.speedX = (Math.random() - 0.5) * 40;
 				lastCreatedComponent.speedY = (Math.random() - 0.5) * 40;			
-				playsound('games/soul/dssklatk.wav');
+				playsound('games/soul/dssklatk.mp3');
 			}
 		}
 	}
@@ -2706,13 +2706,13 @@ var painElemental = function() {
 	this.explode = function()
 	{	
 		effect_list.push(new painSpawner(1, 1, 'games/null.png', this.x, this.y,'image'));
-		playsound("games/pain/dspedth.wav");
+		playsound("games/pain/dspedth.mp3");
 		this.explode0(102,86,"games/pain/death.png",6,6,true);
 		deathDrop(150,this.x,this.y);
 	}
 	this.pain = function()
 	{
-		playsound("games/pain/dspepain.wav");
+		playsound("games/pain/dspepain.mp3");
 		this.setState(-1,'games/pain/pain.png')    
 	}
 	this.monster_update = function()
@@ -2775,7 +2775,7 @@ var painElemental = function() {
 				this.setState(2,'games/pain/attack2.png');
 				monsters_list.push(new lostsoul(44, 51, "games/soul/idle.png", this.x, this.y,'image'));
 				_powerLevel += lastCreatedMonster.powerLevel;
-				playsound('games/soul/dssklatk.wav');
+				playsound('games/soul/dssklatk.mp3');
 				lastCreatedComponent.setState(2)
 				lastCreatedComponent.chargeAt(myGamePiece,getRandomInt(15,30),Math.random());   
 				lastCreatedComponent.timer = getRandomInt(0,25)
@@ -2830,7 +2830,7 @@ var cardinal = function()
 	}
 	this.pain = function()
 	{
-		playsound("games/head/dsdmpain.wav");
+		playsound("games/head/dsdmpain.mp3");
 		this.setState(-1,'games/card/pain.png')    
 		this.imageWidth = 140;
 		this.imageHeight = 140;
@@ -2885,7 +2885,7 @@ var cardinal = function()
 					this.imageWidth = 104;
 					this.imageHeight = 104;
 					this.attackRemain = getRandomInt(1,2)*getRandomInt(1,2)*getRandomInt(1,2)+2;
-					//playsound('games/card/dscybsit.wav')
+					//playsound('games/card/dscybsit.mp3')
 					this.targetRange = this.targetRange + (Math.random()*1000);
 					this.speedX = this.speedX * Math.random();
 					this.speedY = this.speedY * Math.random();
@@ -2915,7 +2915,7 @@ var cardinal = function()
 			if (this.timer >= 12)
 			{ 
 				this.setState(2,'games/card/attack2.png');
-				playsound('games/player/DSRLFIRE.wav');
+				playsound('games/player/DSRLFIRE.mp3');
 				this.imageWidth = 104;
 				this.imageHeight = 104;
 				angl = getRandomFloat(-0.25,0.25);
@@ -2999,7 +2999,7 @@ var pickup = function(){
 	this.weaponGive = -1;
 	this.accelerationY = 0.05;
 	this.speedY = -1;
-	this.pickupSound = 'games/items/dsitemup.wav';
+	this.pickupSound = 'games/items/dsitemup.mp3';
 }
 pickup.prototype = component.prototype;
 pickup.prototype.constructor = pickup;
@@ -3025,7 +3025,7 @@ var cacodemonBall = function(){
 	monsterBall.apply(this,arguments);
 	this.damage = 5;
 	this.dice = 8;
-	this.deathSound = 'games/dsfirxpl.wav';
+	this.deathSound = 'games/dsfirxpl.mp3';
 	this.explode = function()
 	{
 		this.explode0(64, 64, "games/head/ballexp.png",3,3);
@@ -3046,7 +3046,7 @@ var afritBall = function() {
 	this.damage = 8;
 	this.dice = 8;
 	this.state = 1;
-	this.deathSound = 'games/dsfirxpl.wav';
+	this.deathSound = 'games/dsfirxpl.mp3';
 	this.explode = function()
 	{
 		this.explode0(103, 86, "games/explode.png",6,3);
@@ -3061,7 +3061,7 @@ var revenantMissile = function() {
 	this.dice = 8;
 	this.state = 1;
 	this.friction = 0.95;
-	this.deathSound = 'games/dxbarexp.wav';
+	this.deathSound = 'games/dxbarexp.mp3';
 	this.homingStrength = 0.05
 	this.explode = function()
 	{
@@ -3087,7 +3087,7 @@ var monsterRocket = function() {
 	this.dice = 8;
 	this.state = 1;
 	this.friction = 0.95;
-	this.deathSound = 'games/dxbarexp.wav';
+	this.deathSound = 'games/dxbarexp.mp3';
 	this.homingStrength = getRandomFloat(0.01,0.05);
 	this.explode = function()
 	{
@@ -3385,7 +3385,7 @@ function updateGameArea()
 		{
 			_cursorCooldown = (6 - _cursorCooldown)	
 			_selectedMenu -= 1;		
-			playsound('games/dspstop.wav');
+			playsound('games/dspstop.mp3');
 			if (_selectedMenu<0)
 			{
 				_selectedMenu = _menuItemMax
@@ -3398,7 +3398,7 @@ function updateGameArea()
 		{
 			_cursorCooldown = (6 - _cursorCooldown)			
 			_selectedMenu += 1;
-			playsound('games/dspstop.wav');
+			playsound('games/dspstop.mp3');
 			if (_selectedMenu>_menuItemMax)
 			{
 				_selectedMenu = 0
@@ -3411,7 +3411,7 @@ function updateGameArea()
 		if (_menuCooldown<=0 && myGameArea.keys && (myGameArea.keys[13]))
 		{
 			_menuCooldown = 20;
-			playsound('games/player/DSTPFIR.wav');
+			playsound('games/player/DSTPFIR.mp3');
 			switch (_currentMenu) {
 				case 0:
 				switch (_selectedMenu) {
