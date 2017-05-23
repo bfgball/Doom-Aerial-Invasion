@@ -3117,15 +3117,11 @@ function updateGameArea()
 	_windowHeight = document.body.clientHeight;
 	myGameArea.clear();
 	myGameArea.frameNo += 1;
-	// reportTimeout -= 1;
-	// if (reportTimeout <= 0)
-	// {
-	// 	reportTimeout = 100;
+
 	// 	console.log('MISSILES[] ' + missiles_list.length)
 	// 	console.log('MONSTERS[] ' + monsters_list.length)
 	// 	console.log('MONSTER_BALL[] ' + monsterball_list.length)
 	// 	console.log('EFFECT[] ' + effect_list.length)
-	// }
 
 	if (_gameState > 0)
 	{
@@ -3278,11 +3274,17 @@ function updateGameArea()
 			if (hp > 0.5)
 			{
 				colorG = 'ff';
-				colorR = convert.dec2hex(Math.floor((2 - (hp*2))*255));			
+				colorR = convert.dec2hex(Math.floor((2 - (hp*2))*255));		
+				if (colorR.length < 2){
+					colorR = '0' + colorR
+				}
 			}
 			else if (hp <= 0.5 && hp > 0)
 			{
 				colorG = convert.dec2hex(Math.floor((hp*2)*255));
+				if (colorG.length < 2){
+					colorG = '0' + colorG
+				}
 				colorR = 'ff';
 			} 
 			else if (hp <= 0)
@@ -3568,8 +3570,17 @@ function updateGameArea()
 			colorB -= 1
 		}
 		colorR = convert.dec2hex(colorR);
+		if (colorR.length < 2){
+			colorR = '0' + colorR;
+		}
 		colorG = convert.dec2hex(colorG);
+		if (colorG.length < 2){
+			colorG = '0' + colorG;
+		}
 		colorB = convert.dec2hex(colorB);
+		if (colorB.length < 2){
+			colorB = '0' + colorB;
+		}
 		message_list[i].color = ('#' + colorR + colorG + colorB);
 
 		if (message_list[i].timer <= 0) 
@@ -3646,4 +3657,5 @@ function sound(src) {
 		this.sound.pause();
 	}    
 }
+
 
