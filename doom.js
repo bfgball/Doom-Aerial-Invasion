@@ -540,8 +540,6 @@ function updateTension()
 	_tension = myGamePiece.health / 100 * (myGamePiece.armor / 200 + 1) * v;
 	_tension = _tension * ((myGamePiece.ammo[1] / 800) + (myGamePiece.ammo[3] / 2000) + (myGamePiece.ammo[4] / 400) + (myGamePiece.ammo[5] / 600) + (myGamePiece.ammo[7] / 100) + 0.25);
 	_tension = _tension / ((_powerLevel + 500) / 500) * ((_luck + 1000) / 1000);
-
-	console.log('TENSION  -  ' + _tension)
 }
 
 
@@ -3119,15 +3117,15 @@ function updateGameArea()
 	_windowHeight = document.body.clientHeight;
 	myGameArea.clear();
 	myGameArea.frameNo += 1;
-	reportTimeout -= 1;
-	if (reportTimeout <= 0)
-	{
-		reportTimeout = 100;
-		console.log('MISSILES[] ' + missiles_list.length)
-		console.log('MONSTERS[] ' + monsters_list.length)
-		console.log('MONSTER_BALL[] ' + monsterball_list.length)
-		console.log('EFFECT[] ' + effect_list.length)
-	}
+	// reportTimeout -= 1;
+	// if (reportTimeout <= 0)
+	// {
+	// 	reportTimeout = 100;
+	// 	console.log('MISSILES[] ' + missiles_list.length)
+	// 	console.log('MONSTERS[] ' + monsters_list.length)
+	// 	console.log('MONSTER_BALL[] ' + monsterball_list.length)
+	// 	console.log('EFFECT[] ' + effect_list.length)
+	// }
 
 	if (_gameState > 0)
 	{
@@ -3276,23 +3274,23 @@ function updateGameArea()
 			myScouter.text = Math.floor(scouterTarget.health);
 
 			hp = scouterTarget.health / scouterTarget.maxhealth;
-			console.log(hp);
+			// console.log(hp);
 			if (hp > 0.5)
 			{
 				colorG = 'ff';
 				colorR = convert.dec2hex(Math.floor((2 - (hp*2))*255));			
 			}
-			else if (hp <= 0.5)
+			else if (hp <= 0.5 && hp > 0)
 			{
 				colorG = convert.dec2hex(Math.floor((hp*2)*255));
 				colorR = 'ff';
 			} 
-			else if (hp < 0)
+			else if (hp <= 0)
 			{
 				colorG = 'ff';
 				colorR = 'ff';
 			}
-			console.log('#' + colorR + colorG + '00');
+			// console.log('#' + colorR + colorG + '00');
 			myScouter.color = '#' + colorR + colorG + '00';
 			myScouter.x = scouterTarget.x;
 			myScouter.y = scouterTarget.y + Math.ceil(scouterTarget.height / 2 + 16);
@@ -3445,8 +3443,8 @@ function updateGameArea()
 
 				break;
 			}
-			console.log('Menu   - ' + _currentMenu);
-			console.log('Select - ' + _selectedMenu);
+			// console.log('Menu   - ' + _currentMenu);
+			// console.log('Select - ' + _selectedMenu);
 		}
 
 	}
