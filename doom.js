@@ -1,4 +1,3 @@
-var myGamePiece;
 var _skybox;
 var _skybox2;
 var _skyhell;
@@ -7,7 +6,8 @@ var _ground;
 var _ground2;
 var _logo;
 var _newGame;
-var _options;
+var _readme;
+var _option;
 var _rank;
 var _help;
 var _currentMenu;
@@ -35,6 +35,8 @@ var pixel_list = [];
 var pixel_list1 = [];
 var highscores_list = [];
 var SoundIndex = 0;
+var SoundIndex1 = 0;
+var myGamePiece;
 var myScore;
 var myLuck;
 var myPowerLevel;
@@ -48,11 +50,12 @@ var myHUD;
 var myArmor;
 var myArmorCounter;
 var myScouter;
+var myCrosshairH;
+var myCrosshairV;
+var _targetCrosshairY
 var scouterHidden;
 var scouterCheck = 0;
-
 var scouterTarget;
-
 var lastCreatedComponent;
 var lastCreatedSpecialEffect;
 var lastCreatedPickup;
@@ -60,7 +63,6 @@ var lastCreatedPixel;
 var lastDamageTaken;
 var lastCreatedMonster;
 var _gameState = -1;
-var reportTimeout = 60;
 var _luck = 0;
 var _powerLevel = 0;
 var _maxPowerLevel = 500;
@@ -74,7 +76,6 @@ var _windowWidth = 1000;
 var _windowHeight = 1000;
 var _killCount = 0;
 var _score = 0;
-
 var _hkillCount = 0;
 var _hscore = 0;
 var _monsterPreferenceMod = [
@@ -97,6 +98,8 @@ var _monsterPreferenceMod = [
 //8 Amageddon
 [1, 1, 1, 50]
 ];
+
+const PI = 3.1415926535897932384626433832795;
 
 const convert = {
 	bin2dec : s => parseInt(s, 2).toString(10),
@@ -127,18 +130,63 @@ function pixelExplosion1(number,color,x,y,angle,spread,speed)
 	}
 }
 
-function showEnemyHP(target,x,y)
-{
-
-
-
-}
-
-
 function setupSound() {
 	for (i=0; i<16; i++)
 	{
 		sound_list.push(new sound(''))
+	}
+}
+
+const SOUND_CHANNEL_PLAYER = 11;
+const SOUND_CHANNEL_ACTION = 11;
+const SOUND_CHANNEL_PICKUP = 12;
+const SOUND_CHANNEL_WEAPON = 13;
+function playsound(file,index) {
+	//index 0-10 for playing random sounds;
+	if (!index)
+	{
+		if (index == SOUND_CHANNEL_WEAPON)
+		{
+			if (SoundIndex1<15)
+			{
+				sound_list[SoundIndex1].sound.src = file;
+				sound_list[SoundIndex1].play();
+				SoundIndex1 += 1;
+			} else 
+			{
+				SoundIndex1 = 13;
+			}
+		}
+		else
+		{
+			if (SoundIndex<10)
+			{
+				sound_list[SoundIndex].sound.src = file;
+				sound_list[SoundIndex].play();
+				SoundIndex += 1;
+			} else 
+			{
+				SoundIndex = 0;
+			}
+		}
+	} else {
+		sound_list[index].sound.src = file;
+		sound_list[index].play();
+	}
+}
+
+function sound(src) {
+	this.sound = document.createElement("audio");
+	this.sound.src = src;
+	this.sound.setAttribute("preload", "auto");
+	this.sound.setAttribute("controls", "none");
+	this.sound.style.display = "none";
+	document.body.appendChild(this.sound);
+	this.play = function(){
+		this.sound.play();
+	}
+	this.stop = function(){
+		this.sound.pause();
 	}
 }
 
@@ -166,16 +214,6 @@ function getRandomFloat(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
-function playsound(file) {
-	if (SoundIndex>=10)
-	{
-		SoundIndex = 0;
-	}
-	sound_list[SoundIndex].sound.src = file;
-	sound_list[SoundIndex].play();
-	SoundIndex = SoundIndex+1;
-}
-
 function startGame() {
 	_skybox = new component(256, 128, "games/RSKY1.png", 0, 0, "background");
 	_skybox2 = new component(256, 128, "games/RSKY1.png", 0, 0, "background");
@@ -185,7 +223,8 @@ function startGame() {
 	_ground2 = new component(256, 256, "games/floor2.png", 0, 0, "background");	
 	_logo = new component(256, 192, "games/logo.png", 0, 0, "image");
 	_newGame = new component(140, 20, "games/M_NGAME.png", 0, 0, "image");
-	_options = new component(140, 20, "games/M_READ.png", 0, 0, "image");
+	_readme = new component(140, 20, "games/M_READ.png", 0, 0, "image");
+	_option =  new component(140, 20, "games/M_OPTION.png", 0, 0, "image");
 	_rank = new component(140, 20, "games/M_RANK.png", 0, 0, "image");
 	_help = new component(360, 240, "games/help.png", 0, 0, "image");
 	_skull = new component(20, 19, "games/M_SKULL.png", 0, 0, "image");
@@ -194,7 +233,7 @@ function startGame() {
 	_selectedMenu = 0;
 	_maxPowerLevel = 0;
 	_additionalPowerLevel = 0;
-	_menuItemMax = 2;
+	_menuItemMax = 3;
 	_cursorOffset = 0;
 	myGameArea.start();
 	setupSound();
@@ -206,6 +245,13 @@ function startGame() {
 
 function mainMenu(){
 	_gameState = 0;
+	_logo = new component(256, 192, "games/logo.png", 0, 0, "image");
+	_newGame = new component(140, 20, "games/M_NGAME.png", 0, 0, "image");
+	_readme = new component(140, 20, "games/M_READ.png", 0, 0, "image");
+	_option =  new component(140, 20, "games/M_OPTION.png", 0, 0, "image");
+	_rank = new component(140, 20, "games/M_RANK.png", 0, 0, "image");
+	_help = new component(360, 240, "games/help.png", 0, 0, "image");
+	_skull = new component(20, 19, "games/M_SKULL.png", 0, 0, "image");
 	delete myGamePiece;
 	delete myScore;
 	delete myLuck;
@@ -220,27 +266,24 @@ function mainMenu(){
 	delete myWeapon;
 	delete myAmmoCounter;
 	delete myScouter;
-	_cursorOffset = 64;
-	_currentMenu = 2;
-	_selectedMenu = 2;
-	if (_score > _hscore)
-	{
+	delete myCrosshairH;
+	delete myCrosshairV;
+	_cursorOffset = 96;
+	_currentMenu = 3;
+	_selectedMenu = 3;
+	if (_score > _hscore) {
 		_hscore = _score;
 	}
-	if (_killCount > _hkillCount)
-	{
+	if (_killCount > _hkillCount) {
 		_hkillCount = _killCount;
 	}
 	createHighscores();
 	purge();
 	myGameArea.resize();
-
 }
 
 
-
 function purge(){
-
 	for (i = missiles_list.length - 1; i >= 0; i -= 1) {
 		delete missiles_list[i];
 		missiles_list.splice(i, 1);
@@ -267,6 +310,11 @@ function purge(){
 		pickup_list.splice(i, 1);
 	}
 
+	for (i = message_list.length - 1; i >= 0; i -= 1) {
+		delete message_list[i];
+		message_list.splice(i, 1);
+	}
+
 	for (i = pixel_list.length - 1; i >= 0; i -= 1) {
 		delete pixel_list[i];
 		pixel_list.splice(i, 1);
@@ -286,7 +334,6 @@ function checkEvent()
 		{
 			_eventCooldown -= 1 
 		}
-
 		if (_eventCooldown == 0)
 		{
 			_eventCooldown = -1;
@@ -303,9 +350,6 @@ function checkEvent()
 				lastCreatedMonster.height = 90;
 				playsound('games/card/dscybsit.mp3');
 				_powerLevel = _powerLevel + 10000;
-				break;
-				default:
-				// statements_def
 				break;
 
 				case 3:
@@ -345,6 +389,13 @@ function resizeGame()
 
 function loadLevel(level)
 {
+	delete _logo;
+	delete _newGame;
+	delete _readme;
+	delete _option;
+	delete _rank;
+	delete _help;
+	delete _skull;
 	switch (level) {
 		case 1:
 		myGamePiece = new player(54, 54, "games/player/idle.png", myGameArea.canvas.width / 2, (myGameArea.canvas.height * 3) / 4, "image");
@@ -356,6 +407,10 @@ function loadLevel(level)
 		myDmg = new component("12px", "DooM", "white", myGameArea.canvas.width/2 - 128, 64, "text");
 		myKill = new component("12px", "DooM", "white", myGameArea.canvas.width/2 + 64, 64, "text");
 		myHealth = new component("16px", "mortis", "#99ff99", 0, 0, "text");
+		myCrosshairH = new component(16, 2, "#99ff99", 0, 0, "");
+		lastCreatedComponent.transparency = 0.75;
+		myCrosshairV = new component(2, 16, "#99ff99", 0, 0, "");
+		lastCreatedComponent.transparency = 0.75;
 		myAmmoCounter = new component("16px", "mortis", "yellow", 0, 0, "text");
 		myWeapon = new component(80, 36, "games/player/Pistol.png", 0, 0, "image");
 		myScouter = new component("16px", "mortis", "#888800", 0, 0, "text");
@@ -364,9 +419,6 @@ function loadLevel(level)
 		myArmor = new component(31, 17, "games/null.png", 0, 0, "image");
 		myArmorCounter = new component("16px", "mortis", "cyan", 0, 0, "text");
 		delete _systemMessage.text;
-
-		//monsters_list.push(new cardinal(104,104,'games/card/idle.png', myGameArea.canvas.width/2,-64,'image'));
-
 
 		_gameState = 1;
 		_spawnSet = 0;
@@ -386,18 +438,13 @@ function loadLevel(level)
 
 function spawnMonster()
 {
-	if (_difficult>=105 && _gameState < 2)
-	{
-		_gameState = 2;
-		_nextEvent = 2;
-		_eventCooldown = 1000;
-
-	}
 	if (_monsterSpawnCooldown <= 0)
 	{
-		if (_difficult >= 100)
+		if (_difficult>=105 && _gameState < 2)
 		{
-
+			_gameState = 2;
+			_nextEvent = 2;
+			_eventCooldown = 1000;
 		}
 
 		rnd = getRandomInt(1,100);
@@ -417,7 +464,6 @@ function spawnMonster()
 		{
 			_fullScale = true;
 		}
-
 
 		monsterPreference = 
 		[
@@ -540,7 +586,7 @@ function updateTension()
 		{v = 0.4}
 	_tension = myGamePiece.health / 100 * (myGamePiece.armor / 200 + 1) * v;
 	_tension = _tension * ((myGamePiece.ammo[1] / 800) + (myGamePiece.ammo[3] / 2000) + (myGamePiece.ammo[4] / 400) + (myGamePiece.ammo[5] / 600) + (myGamePiece.ammo[7] / 100) + 0.25);
-	_tension = _tension / ((_powerLevel + 500) / 500) * ((_luck + 1000) / 1000);
+	_tension = _tension / ((_powerLevel + 1000) / 1000) * ((_luck + 4000) / 4000);
 }
 
 
@@ -735,7 +781,7 @@ function deathDrop(rarity,x,y,chance)
 			itemPreference[m] += Math.floor((200 - myGamePiece.health)*0.02 * _luck/600);
 			itemPreference[m] += Math.floor((200 - myGamePiece.armor)*0.02 * _luck/600);
 			break;
-			//Packback
+			//Backpack
 			case 17:
 			itemPreference[m] = 5;
 			break;
@@ -747,8 +793,6 @@ function deathDrop(rarity,x,y,chance)
 			itemPreference[m] = 0;
 		}
 	}
-
-
 	poolMax = 0;
 	for (m = 0; m < itemPreference.length; m++) {
 		poolMax = poolMax + itemPreference[m];
@@ -1015,10 +1059,10 @@ var myGameArea =
 	{
 		XBefore = this.canvas.width;
 		YBefore = this.canvas.height;
-		this.canvas.width = (document.body.clientWidth * 0.975);
-		if (this.canvas.width>1600) {this.canvas.width=1600};
+		this.canvas.width = (document.body.clientWidth * 0.9875);
+		//if (this.canvas.width>1600) {this.canvas.width=1600};
 		this.canvas.height = (Math.max( window.innerHeight, document.body.clientHeight ) * 0.975);
-		if (this.canvas.height>900) {this.canvas.height=900};
+		//if (this.canvas.height>900) {this.canvas.height=900};
 		XAfter = this.canvas.width;
 		YAfter = this.canvas.height;
 		XScale = XAfter / XBefore;
@@ -1099,11 +1143,14 @@ var myGameArea =
 			_newGame.x = this.canvas.width/2;
 			_newGame.y = this.canvas.height/2;
 
-			_options.x = this.canvas.width/2;
-			_options.y = this.canvas.height/2 + 32;
+			_readme.x = this.canvas.width/2;
+			_readme.y = this.canvas.height/2 + 32;
+
+			_option.x = this.canvas.width/2;
+			_option.y = this.canvas.height/2 + 64;
 
 			_rank.x = this.canvas.width/2;
-			_rank.y = this.canvas.height/2 + 64;
+			_rank.y = this.canvas.height/2 + 96;
 
 			_skull.x = this.canvas.width/2 - 100;
 			_skull.y = this.canvas.height/2 + _cursorOffset;
@@ -1114,6 +1161,8 @@ var myGameArea =
 		}
 	}
 }
+
+
 
 function pixel(color,x,y,speed,friction,angle,life,size)
 {
@@ -1324,7 +1373,6 @@ function component(width, height, color, x, y, type)
 		dist = Math.sqrt(((this.x - target.x)*(this.x - target.x)) + ((this.y - target.y)*(this.y - target.y)))
 		dX = target.x - this.x;
 		ang = Math.asin(dX/dist);
-		PI = 3.1415926535897932384626433832795;
 
 		if (target.y > this.y)
 		{
@@ -1420,14 +1468,13 @@ function component(width, height, color, x, y, type)
 			ctx.fillRect(-this.width / 2, -this.height/ 2, this.width, this.height);
 		} 
 		ctx.globalAlpha = 1;
-		ctx.restore();    
+		ctx.restore();
 	}
 	this.newPos = function() {
 		this.speedX +=  this.accelerationX;
 		this.speedY +=  this.accelerationY;         
 		this.speedX = this.speedX * this.friction;
 		this.speedY = this.speedY * this.friction;
-
 		this.x += this.speedX;
 		this.y += this.speedY;
 	}
@@ -1518,6 +1565,8 @@ var HUD = function()
 		myArmor.y =  myGamePiece.y + 64;
 		myArmorCounter.x = myGamePiece.x + 32;
 		myArmorCounter.y = myGamePiece.y + 64;
+		myCrosshairH.x = myGamePiece.x;
+		myCrosshairV.x = myGamePiece.x;
 	}
 	this.updateMugshot = function()
 	{
@@ -1587,7 +1636,6 @@ var player = function()
 	this.ammo = [                 -1,       0,             0,         0,            0,           0,       0,       0];
 	this.ammoMax = [   			  -1,       50,            50,      200,          50,          300,     300,      100];
 	this.weaponAvailable = [    true,    false,         false,     false,           false,        false,    false,    false];
-
 	this.weaponSwitchSound = ["get0",   "get1",        "get2",    "get3",          "get4",       "get5",   "get6",  "get7"];
 	this.weaponAmmoUse = [         -2,        1,            2,         1,             1,            1,          40,      1]
 	this.currentWeapon = 0;
@@ -1598,35 +1646,42 @@ var player = function()
 	this.isCharging = false;
 	this.player_switch = function(index)
 	{
-		if (this.currentWeapon == index)
+		if (this.weaponSwitchCooldown <= 0)
 		{
-			return false;        
-		}
-		else if (this.weaponAvailable[index] == false)
-		{
-			this.messageHidden = 100;
-			myMessage.text = this.weapon[index] + ' is not available';
-			return false;
-		}
-		else if ((this.ammo[index] < this.weaponAmmoUse[index]) && (this.ammo[index] != -1))
-		{
-			this.messageHidden = 100;
-			myMessage.text = this.weapon[index] + ' is out of ammo';
-			return false;
-		}
+			this.weaponSwitchCooldown = 20;
+			if (this.currentWeapon == index)
+			{
+				return false;        
+			}
+			else if (this.weaponAvailable[index] == false)
+			{
+				this.messageHidden = 100;
+				myMessage.text = this.weapon[index] + ' is not available';
+				playsound('games/player/lowammo.mp3',SOUND_CHANNEL_ACTION);
+				return false;
+			}
+			else if ((this.ammo[index] < this.weaponAmmoUse[index]) && (this.ammo[index] != -1))
+			{
+				this.messageHidden = 100;
+				myMessage.text = this.weapon[index] + ' is out of ammo';
+				playsound('games/player/lowammo.mp3',SOUND_CHANNEL_ACTION);
+				return false;
+			}
 
-		else if (this.weaponState != 0)
-		{
-			this.messageHidden = 100;
-			myMessage.text = "Can't change weapon while firing";
-			return false;
+			else if (this.weaponState != 0)
+			{
+				this.messageHidden = 100;
+				myMessage.text = "Can't change weapon while firing";
+				return false;
+			}
+			
+			this.weaponState = 0;
+			this.usingAmmo = false;
+			this.currentWeapon = index;
+			myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
+			playsound('games/player/' + this.weaponSwitchSound[index] + '.mp3', SOUND_CHANNEL_ACTION);
+			this.weaponHidden = 50;
 		}
-		this.weaponState = 0;
-		this.usingAmmo = false;
-		this.currentWeapon = index;
-		myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
-		playsound('games/player/' + this.weaponSwitchSound[index] + '.mp3');
-		this.weaponHidden = 50;
 	}
 	this.player_quickSwitch = function(index)
 	{
@@ -1651,7 +1706,7 @@ var player = function()
 		this.usingAmmo = false;
 		this.currentWeapon = index;
 		myWeapon.image.src = 'games/player/' + this.weapon[index] + '.png';
-		playsound('games/player/' + this.weaponSwitchSound[index] + '.mp3');
+		playsound('games/player/' + this.weaponSwitchSound[index] + '.mp3', SOUND_CHANNEL_ACTION);
 		this.weaponHidden = 50;
 		return true;
 	}
@@ -1661,7 +1716,7 @@ var player = function()
 		this.isDead = true;
 		myHUD.updateMugshot();
 		myHUD.hidden = 100;
-		playsound('games/player/dspdiehi.mp3');            
+		playsound('games/player/dspdiehi.mp3',SOUND_CHANNEL_PLAYER);            
 		myGamePiece.explode0(56, 56, "games/player/death.png",6,7,true);
 		myGamePiece.pauseFire == 99999;
 		_nextEvent = 1;
@@ -1670,8 +1725,7 @@ var player = function()
 	this.pain = function()
 	{
 		updateTension();
-		
-		playsound('games/player/dsplpain.mp3');  
+		playsound('games/player/dsplpain.mp3',SOUND_CHANNEL_PLAYER);  
 		this.setState(-1, 'games/player/pain.png');
 		myHUD.setState(-1);
 		myHUD.updateMugshot();
@@ -1867,7 +1921,7 @@ var player = function()
 		if (eaten == true)
 		{
 			updateTension();
-			playsound(item.pickupSound);
+			playsound(item.pickupSound,SOUND_CHANNEL_PICKUP);
 		} else {
 			_pickupFlash = false;
 		}
@@ -1888,7 +1942,7 @@ var player = function()
 			lastCreatedComponent.dice = 3;        
 			pixelExplosion(3,'#ffffcc',this.x,this.y-16,this.angle,0.3,5);
 			this.cooldown = 15;
-			playsound('games/player/DSTPFIR.mp3');
+			playsound('games/player/DSTPFIR.mp3',SOUND_CHANNEL_WEAPON);
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1922,7 +1976,7 @@ var player = function()
 			}
 			pixelExplosion(25,'#ffffcc',this.x,this.y-16,this.angle,0.6,9);
 			this.cooldown = 75;
-			playsound('games/player/DSDSHTGN.mp3');
+			playsound('games/player/DSDSHTGN.mp3',SOUND_CHANNEL_WEAPON);
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1931,7 +1985,7 @@ var player = function()
 			switch (this.weaponState) 
 			{
 				case 0:
-				playsound('games/player/DSMINSTA.mp3');
+				playsound('games/player/DSMINSTA.mp3',SOUND_CHANNEL_ACTION);
 				this.cooldown = 15;
 				this.holdFire = true;
 				this.weaponState = 1;
@@ -1939,7 +1993,7 @@ var player = function()
 				break;
 				case 1:
 				this.usingAmmo = true;
-				playsound('games/player/DSMINI1.mp3');
+				playsound('games/player/DSMINI1.mp3',SOUND_CHANNEL_WEAPON);
 				pixelExplosion(3,'#ffffcc',this.x,this.y-16,this.angle,0.35,10);
 				this.cooldown = 5;
 				missiles_list.push(new tracer(64, 64, "games/player/tracer.png", this.x, this.y,'image'));
@@ -1959,7 +2013,7 @@ var player = function()
 				break;
 				case 2:
 				this.holdFire = false;
-				playsound('games/player/DSMINSTO.mp3');
+				playsound('games/player/DSMINSTO.mp3',SOUND_CHANNEL_ACTION);
 				this.cooldown = 15;
 				this.weaponState = 0;
 				break;
@@ -1977,7 +2031,7 @@ var player = function()
 			lastCreatedComponent.dice = 8;
 			pixelExplosion(10,'#ff6666',this.x,this.y-16,this.angle,0.25,15);
 			this.cooldown = 27;
-			playsound('games/player/DSRLFIRE.mp3');
+			playsound('games/player/DSRLFIRE.mp3',SOUND_CHANNEL_WEAPON);
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -1992,7 +2046,7 @@ var player = function()
 			lastCreatedComponent.dice = 8;
 			pixelExplosion(2,'#3399ff',this.x,this.y-16,this.angle,0.3,12);
 			this.cooldown = 4;
-			playsound('games/player/DSPLAS2.mp3');
+			playsound('games/player/DSPLAS2.mp3',SOUND_CHANNEL_WEAPON);
 			this.setState(1 , "games/player/fire2.png")
 			break;
 
@@ -2004,7 +2058,7 @@ var player = function()
 				this.cooldown = 30;
 				this.holdFire = true;
 				this.weaponState = 1;
-				playsound('games/player/dsbfg.mp3');
+				playsound('games/player/dsbfg.mp3',SOUND_CHANNEL_WEAPON);
 				this.setState(1 , "games/player/fire.png")
 				break;
 				case 1:
@@ -2035,7 +2089,7 @@ var player = function()
 			lastCreatedComponent.dice = 8;    
 			pixelExplosion(5,'#0099ff',this.x,this.y-16,this.angle,0.3,20);    
 			this.cooldown = 10;
-			playsound('games/player/dbfgfir2.mp3');
+			playsound('games/player/dbfgfir2.mp3',SOUND_CHANNEL_WEAPON);
 			this.setState(1 , "games/player/fire2.png")
 			break;
 		}
@@ -2076,12 +2130,43 @@ var player = function()
 		}
 		if (this.cooldown>0) {
 			this.cooldown -= 1;
+			switch (this.currentWeapon) {
+				case 0:
+					myCrosshairH.width = this.cooldown * 3;
+					break;
+				case 3:
+					myCrosshairH.width = this.cooldown * 5;
+					break;
+				case 4:
+					myCrosshairH.width = this.cooldown * 2;
+					break;
+				case 5:
+					myCrosshairH.width = this.cooldown * 8;
+					break;
+				case 6:
+					myCrosshairH.width = this.cooldown * 2;
+					break;
+				case 7:
+					myCrosshairH.width = this.cooldown * 2;
+					break;
+				default:
+					myCrosshairH.width = this.cooldown;
+					break;
+			}
+			myCrosshairH.color = '#ffff66';
+			myCrosshairV.color = '#ffff66';
+		} else {
+			myCrosshairH.color = '#66ff66';
+			myCrosshairV.color = '#66ff66';
+			myCrosshairH.width = 16;
 		}
 		if (this.pauseFire > 0){
 			this.isFiring = false;
 		}
 		if(this.weaponState == 0 && this.ammo[this.currentWeapon] < this.weaponAmmoUse[this.currentWeapon])
 		{
+			myCrosshairH.color = '#ff9999';
+			myCrosshairV.color = '#ff9999';
 			myMessage.text = 'Out of Ammo!';
 			myGamePiece.messageHidden = 50;		
 		} else {
@@ -2094,9 +2179,12 @@ var player = function()
 					{
 						this.useAmmo();
 					} else {
+						myCrosshairH.color = '#ff9999';
+						myCrosshairV.color = '#ff9999';
 						myMessage.text = 'Out of Ammo!';
 						myGamePiece.messageHidden = 50;		
 						this.pauseFire = this.cooldown+1;
+						playsound('games/player/noammo.mp3',SOUND_CHANNEL_ACTION);
 					}
 				}
 			}		
@@ -2154,7 +2242,6 @@ var player = function()
 }
 player.prototype = component.prototype;
 player.prototype.constructor = player;
-
 
 var missile = function()
 {
@@ -2537,7 +2624,7 @@ var afrit = function(){
 	this.friction = 0.85;
 	this.health = 1000;
 	this.maxhealth = 1000;
-	this.mass = 1000;
+	this.mass = 100;
 	this.frameLength = 8;
 	this.painChance = 12;
 	this.powerLevel = 400;
@@ -2695,7 +2782,6 @@ var painSpawner = function()
 	}
 }
 
-
 var painElemental = function() {
 	monsters.apply(this,arguments);
 	this.friction = 0.8;
@@ -2815,7 +2901,7 @@ var cardinal = function()
 	this.friction = 0.9;
 	this.health = 4000;
 	this.maxhealth = 4000;
-	this.mass = 2000;
+	this.mass = 200;
 	this.painChance = 5;
 	this.frameLength = 6;
 	this.powerLevel = 10000;
@@ -3006,8 +3092,6 @@ var pickup = function(){
 pickup.prototype = component.prototype;
 pickup.prototype.constructor = pickup;
 
-
-
 var monsterBall = function(){
 	component.apply(this,arguments);
 	this.explode = function()
@@ -3084,9 +3168,8 @@ revenantMissile.prototype.constructor = revenantMissile;
 
 var monsterRocket = function() {
 	monsterBall.apply(this,arguments);
-	this.damage = 10;
-	//cause u are a bunch of nuuuuubbbbbb lololol haha xdxd
-	this.dice = 8;
+	this.damage = 20;
+	this.dice = 4;
 	this.state = 1;
 	this.friction = 0.95;
 	this.deathSound = 'games/dxbarexp.mp3';
@@ -3142,7 +3225,7 @@ function updateGameArea()
 					missiles_list[i].harm(monsters_list[j]);
 					_score += Math.floor(lastDamageTaken);
 
-					if (scouterCheck == 0 && monsters_list[j].maxhealth > 100)
+					if (scouterCheck == 0 && monsters_list[j].maxhealth > 100 || myGamePiece.currentWeapon == 0)
 					{
 						scouterTarget = monsters_list[j];
 						scouterHidden = Math.floor(Math.sqrt(lastDamageTaken) + 10);
@@ -3190,14 +3273,14 @@ function updateGameArea()
 		_skybox2.transparency = _skybox.transparency;
 
 		_ground.update();
-		targetAlpha =  (4 - _tension) / 4;
+		targetAlpha =  (3 - _tension) / 3;
 		if (_ground2.transparency < targetAlpha)
 		{
 			_ground2.transparency += 0.01;
 		} else {
 			_ground2.transparency -= 0.01;			
 		}
-		_ground2.transparency = _ground2.transparency + (Math.sin(myGameArea.frameNo / 30) * 0.01);
+		_ground2.transparency = _ground2.transparency + (Math.sin(myGameArea.frameNo / 30) * 0.0125);
 		if (_ground2.transparency > 1) 
 			{_ground2.transparency = 1}
 		if (_ground2.transparency < 0) 
@@ -3224,24 +3307,24 @@ function updateGameArea()
 		if (myGameArea.keys && (myGameArea.keys[16] || myGameArea.keys[13])) {myGamePiece.isFiring = true; }
 
 		if (myGameArea.keys && myGameArea.keys[49]) {myGamePiece.player_switch(0); }
-		if (myGameArea.keys && myGameArea.keys[50]) {myGamePiece.player_switch(1); }
-		if (myGameArea.keys && myGameArea.keys[51]) {myGamePiece.player_switch(2); }
-		if (myGameArea.keys && myGameArea.keys[52]) {myGamePiece.player_switch(3); }
-		if (myGameArea.keys && myGameArea.keys[53]) {myGamePiece.player_switch(4); }
-		if (myGameArea.keys && myGameArea.keys[54]) {myGamePiece.player_switch(5); }
-		if (myGameArea.keys && myGameArea.keys[55]) {myGamePiece.player_switch(6); }
-		if (myGameArea.keys && myGameArea.keys[56]) {myGamePiece.player_switch(7); }
-
-		if (myGameArea.keys && myGameArea.keys[69]) {
+		else if (myGameArea.keys && myGameArea.keys[50]) {myGamePiece.player_switch(1); }
+		else if (myGameArea.keys && myGameArea.keys[51]) {myGamePiece.player_switch(2); }
+		else if (myGameArea.keys && myGameArea.keys[52]) {myGamePiece.player_switch(3); }
+		else if (myGameArea.keys && myGameArea.keys[53]) {myGamePiece.player_switch(4); }
+		else if (myGameArea.keys && myGameArea.keys[54]) {myGamePiece.player_switch(5); }
+		else if (myGameArea.keys && myGameArea.keys[55]) {myGamePiece.player_switch(6); }
+		else if (myGameArea.keys && myGameArea.keys[56]) {myGamePiece.player_switch(7); }
+		else if (myGameArea.keys && myGameArea.keys[69]) 
+		{
 			if (myGamePiece.weaponSwitchCooldown <= 0)
 			{
 				i = 1;
 				j = myGamePiece.currentWeapon + i;
-				if (j>7) {j-=7};
+				if (j>7) {j-=8};
 				while (myGamePiece.player_quickSwitch(j) == false && i < 6) {
 					i++;
 					j = myGamePiece.currentWeapon + i;
-					if (j>7) {j-=7};
+					if (j>7) {j-=8};
 				}
 			}
 		} 
@@ -3250,11 +3333,11 @@ function updateGameArea()
 			{
 				i = -1;
 				j = myGamePiece.currentWeapon + i;
-				if (j<0) {j+=7};
+				if (j<0) {j+=8};
 				while (myGamePiece.player_quickSwitch(j) == false && i > -6) {
 					i--;
 					j = myGamePiece.currentWeapon + i;
-					if (j<0) {j+=7};
+					if (j<0) {j+=8};
 				}
 			}
 		} else 
@@ -3268,6 +3351,37 @@ function updateGameArea()
 		myPowerLevel.update();
 		myKill.update();
 		myDmg.update();
+
+		_targetCrosshairY = 0;
+		//myCrosshairH.height = 2;
+		//myCrosshairV.width = 2;
+		myCrosshairV.height = 16;
+		for (var i = monsters_list.length - 1; i >= 0; i--) {
+			if (myCrosshairH.x < monsters_list[i].x + monsters_list[i].width && myCrosshairH.x > monsters_list[i].x - monsters_list[i].width && monsters_list[i].y < myGamePiece.y) 
+			{
+				if (_targetCrosshairY < monsters_list[i].y + monsters_list[i].height)
+				{
+					_targetCrosshairY = monsters_list[i].y + monsters_list[i].height;
+					//myCrosshairH.height = 4;
+					//myCrosshairV.width = 4;
+					yextend = (monsters_list[i].width - Math.abs(myCrosshairH.x-monsters_list[i].x)) * 0.5;
+					myCrosshairV.height = Math.floor((myGameArea.canvas.height - myCrosshairH.y)*0.025 + yextend);
+				}
+			}
+		}
+		if (_targetCrosshairY < 1)
+		{
+			_targetCrosshairY = myGameArea.canvas.height/2
+		}
+
+		if (myCrosshairH.y < _targetCrosshairY)
+		{
+			myCrosshairH.y += (_targetCrosshairY - myCrosshairH.y) * 0.05
+		} else {
+			myCrosshairH.y -= (myCrosshairH.y - _targetCrosshairY) * 0.05
+		}
+		myCrosshairV.y = myCrosshairH.y;
+
 		if (scouterCheck>0 && scouterTarget) {
 			myScouter.text = Math.floor(scouterTarget.health);
 
@@ -3299,13 +3413,6 @@ function updateGameArea()
 			myScouter.x = scouterTarget.x;
 			myScouter.y = scouterTarget.y + Math.ceil(scouterTarget.height / 2 + 16);
 			scouterCheck = 0;
-		}
-
-
-		if (scouterHidden > 0)
-		{
-			myScouter.update();
-			scouterHidden -= 1;
 		}
 
 		if (myHUD.hidden > 0) {
@@ -3358,6 +3465,166 @@ function updateGameArea()
 			_difficult = Math.floor(myGameArea.frameNo / 200) + 10;
 			spawnMonster();
 		}
+
+		for (i = 0; i < missiles_list.length; i += 1) {
+			missiles_list[i].x += missiles_list[i].speed * Math.sin(missiles_list[i].angle);
+			missiles_list[i].y -= missiles_list[i].speed * Math.cos(missiles_list[i].angle);
+			missiles_list[i].update();
+			if (missiles_list[i].boundCheck())
+			{
+				delete missiles_list[i];
+				missiles_list.splice(i, 1);
+			}
+		}
+
+		for (i = monsters_list.length - 1; i >= 0; i -= 1) {
+			monsters_list[i].newPos();
+			monsters_list[i].update();
+			monsters_list[i].monster_update();
+			monsters_list[i].boundpush();     
+			if (monsters_list[i].isDead)
+			{
+				_killCount += 1;
+				_powerLevel -= monsters_list[i].powerLevel;
+				delete monsters_list[i];
+				monsters_list.splice(i, 1);
+			} 
+			else if (monsters_list[i].boundCheck() && monsters_list[i].isBoss == false) {
+				_powerLevel -= monsters_list[i].powerLevel;
+				delete monsters_list[i];
+				monsters_list.splice(i, 1);
+			}
+			else if(monsters_list[i].isCharging == true) {
+				if (monsters_list[i].crashWith(myGamePiece)) {
+					monsters_list[i].harm(myGamePiece);
+					monsters_list[i].isCharging = false;
+					monsters_list[i].timer = 99999;
+					monsters_list[i].speedX = monsters_list[i].speedX * Math.random();
+					monsters_list[i].speedY = monsters_list[i].speedY * Math.random();
+					monsters_list[i].chargeAt(myGamePiece,-getRandomInt(10,20));
+				}
+			}
+		}
+
+		for (i = 0; i < monsterball_list.length; i += 1) {
+			if (monsterball_list[i].state == 1)
+			{
+				monsterball_list[i].x += monsterball_list[i].speed * Math.sin(monsterball_list[i].angle);
+				monsterball_list[i].y -= monsterball_list[i].speed * Math.cos(monsterball_list[i].angle);
+			} 
+			monsterball_list[i].newPos();
+			monsterball_list[i].update();
+			monsterball_list[i].monsterballUpdate();
+			if (monsterball_list[i].boundCheck())
+			{
+				delete monsterball_list[i];
+				monsterball_list.splice(i, 1);
+			}
+		}
+
+
+		for (i = 0; i < effect_list.length; i += 1) 
+		{ 
+			effect_list[i].update();
+			effect_list[i].newPos();
+			effect_list[i].effect_update();
+			if (effect_list[i].timer == 0) 
+			{
+				delete effect_list[i];
+				effect_list.splice(i, 1);
+			}
+		}    
+
+		for (i = 0; i < pickup_list.length; i += 1) { 
+			pickup_list[i].update();
+			pickup_list[i].newPos();
+			if (pickup_list[i].speedY > 4)
+			{
+				pickup_list[i].speedY = 4;
+			}
+
+			if (pickup_list[i].timer>0) {
+				pickup_list[i].timer -= 1
+			}
+
+			if (pickup_list[i].y > myGameArea.canvas.height + 32) 
+			{
+				delete pickup_list[i];
+				pickup_list.splice(i, 1);
+			} 
+			else if (pickup_list[i].crashWith(myGamePiece) && pickup_list[i].timer<=0) 
+			{
+				pickup_list[i].timer = pickup_list[i].timer + 5;
+				if (myGamePiece.eatItem(pickup_list[i]))
+				{
+					delete pickup_list[i];
+					pickup_list.splice(i, 1);
+				}
+			}
+		}    
+
+		for (i = 0; i < message_list.length; i += 1) { 
+			message_list[i].update();
+			message_list[i].newPos();
+			message_list[i].timer -= 1;
+
+			//degrade color
+			colorR = convert.hex2dec(message_list[i].color.slice(1,3));
+			colorG = convert.hex2dec(message_list[i].color.slice(3,5));
+			colorB = convert.hex2dec(message_list[i].color.slice(5,7));
+			if (colorR>0) 
+			{
+				colorR -= 1
+			}
+			if (colorG>0) 
+			{
+				colorG -= 1
+			}
+			if (colorB>0) 
+			{
+				colorB -= 1
+			}
+			colorR = convert.dec2hex(colorR);
+			if (colorR.length < 2){
+				colorR = '0' + colorR;
+			}
+			colorG = convert.dec2hex(colorG);
+			if (colorG.length < 2){
+				colorG = '0' + colorG;
+			}
+			colorB = convert.dec2hex(colorB);
+			if (colorB.length < 2){
+				colorB = '0' + colorB;
+			}
+			message_list[i].color = ('#' + colorR + colorG + colorB);
+
+			if (message_list[i].timer <= 0) 
+			{
+				delete message_list[i];
+				message_list.splice(i, 1);
+			}
+		}
+
+		for (i = 0; i < monsterball_list.length; i += 1) 
+		{
+			if ((monsterball_list[i].crashWith(myGamePiece) && (myGamePiece.isDead == false))) 
+			{
+				monsterball_list[i].harm(myGamePiece)                 
+				monsterball_list[i].explode();
+				delete monsterball_list[i];
+				monsterball_list.splice(i, 1);      
+			}
+		}
+
+		myCrosshairH.update();
+		myCrosshairV.update();
+
+		if (scouterHidden > 0)
+		{
+			myScouter.update();
+			scouterHidden -= 1;
+		}
+
 	} 
 	else if(_gameState == 0)
 	{
@@ -3365,7 +3632,8 @@ function updateGameArea()
 			case 0:
 			_logo.update();
 			_newGame.update();
-			_options.update();
+			_readme.update();
+			_option.update();
 			_rank.update();
 			_skull.update();
 			break;
@@ -3373,6 +3641,9 @@ function updateGameArea()
 			_help.update();
 			break;
 			case 2:
+			
+			break;
+			case 3:
 			for (var i = highscores_list.length - 1; i >= 0; i--) {
 				highscores_list[i].update();
 
@@ -3427,6 +3698,9 @@ function updateGameArea()
 					break;
 					case 2:
 					_currentMenu = 2;
+					break;
+					case 3:
+					_currentMenu = 3;
 					createHighscores();
 					break;
 					default:
@@ -3439,167 +3713,18 @@ function updateGameArea()
 				break;
 				case 2:
 				_currentMenu = 0;
+				break;
+				case 3:
+				_currentMenu = 0;
 				for (var i = highscores_list.length - 1; i >= 0; i--) 
 				{
 					delete highscores_list[i];
 					highscores_list.splice(i, 1);
 				}
-
 				break;
 			}
 			// console.log('Menu   - ' + _currentMenu);
 			// console.log('Select - ' + _selectedMenu);
-		}
-
-	}
-
-	for (i = 0; i < missiles_list.length; i += 1) {
-		missiles_list[i].x += missiles_list[i].speed * Math.sin(missiles_list[i].angle);
-		missiles_list[i].y -= missiles_list[i].speed * Math.cos(missiles_list[i].angle);
-		missiles_list[i].update();
-		if (missiles_list[i].boundCheck())
-		{
-			delete missiles_list[i];
-			missiles_list.splice(i, 1);
-		}
-	}
-
-	for (i = monsters_list.length - 1; i >= 0; i -= 1) {
-		monsters_list[i].newPos();
-		monsters_list[i].update();
-		monsters_list[i].monster_update();
-		monsters_list[i].boundpush();     
-		if (monsters_list[i].isDead)
-		{
-			_killCount += 1;
-			_powerLevel -= monsters_list[i].powerLevel;
-			delete monsters_list[i];
-			monsters_list.splice(i, 1);
-		} 
-		else if (monsters_list[i].boundCheck() && monsters_list[i].isBoss == false) {
-			_powerLevel -= monsters_list[i].powerLevel;
-			delete monsters_list[i];
-			monsters_list.splice(i, 1);
-		}
-		else if(monsters_list[i].isCharging == true) {
-			if (monsters_list[i].crashWith(myGamePiece)) {
-				monsters_list[i].harm(myGamePiece);
-				monsters_list[i].isCharging = false;
-				monsters_list[i].timer = 99999;
-				monsters_list[i].speedX = monsters_list[i].speedX * Math.random();
-				monsters_list[i].speedY = monsters_list[i].speedY * Math.random();
-				monsters_list[i].chargeAt(myGamePiece,-getRandomInt(10,20));
-			}
-		}
-	}
-
-	for (i = 0; i < monsterball_list.length; i += 1) {
-		if (monsterball_list[i].state == 1)
-		{
-			monsterball_list[i].x += monsterball_list[i].speed * Math.sin(monsterball_list[i].angle);
-			monsterball_list[i].y -= monsterball_list[i].speed * Math.cos(monsterball_list[i].angle);
-		} 
-		monsterball_list[i].newPos();
-		monsterball_list[i].update();
-		monsterball_list[i].monsterballUpdate();
-		if (monsterball_list[i].boundCheck())
-		{
-			delete monsterball_list[i];
-			monsterball_list.splice(i, 1);
-		}
-	}
-
-
-	for (i = 0; i < effect_list.length; i += 1) 
-	{ 
-		effect_list[i].update();
-		effect_list[i].newPos();
-		effect_list[i].effect_update();
-		if (effect_list[i].timer == 0) 
-		{
-			delete effect_list[i];
-			effect_list.splice(i, 1);
-		}
-	}    
-
-	for (i = 0; i < pickup_list.length; i += 1) { 
-		pickup_list[i].update();
-		pickup_list[i].newPos();
-		if (pickup_list[i].speedY > 4)
-		{
-			pickup_list[i].speedY = 4;
-		}
-
-		if (pickup_list[i].timer>0) {
-			pickup_list[i].timer -= 1
-		}
-
-		if (pickup_list[i].y > myGameArea.canvas.height + 32) 
-		{
-			delete pickup_list[i];
-			pickup_list.splice(i, 1);
-		} 
-		else if (pickup_list[i].crashWith(myGamePiece) && pickup_list[i].timer<=0) 
-		{
-			pickup_list[i].timer = pickup_list[i].timer + 5;
-			if (myGamePiece.eatItem(pickup_list[i]))
-			{
-				delete pickup_list[i];
-				pickup_list.splice(i, 1);
-			}
-		}
-	}    
-
-	for (i = 0; i < message_list.length; i += 1) { 
-		message_list[i].update();
-		message_list[i].newPos();
-		message_list[i].timer -= 1;
-
-		//degrade color
-		colorR = convert.hex2dec(message_list[i].color.slice(1,3));
-		colorG = convert.hex2dec(message_list[i].color.slice(3,5));
-		colorB = convert.hex2dec(message_list[i].color.slice(5,7));
-		if (colorR>0) 
-		{
-			colorR -= 1
-		}
-		if (colorG>0) 
-		{
-			colorG -= 1
-		}
-		if (colorB>0) 
-		{
-			colorB -= 1
-		}
-		colorR = convert.dec2hex(colorR);
-		if (colorR.length < 2){
-			colorR = '0' + colorR;
-		}
-		colorG = convert.dec2hex(colorG);
-		if (colorG.length < 2){
-			colorG = '0' + colorG;
-		}
-		colorB = convert.dec2hex(colorB);
-		if (colorB.length < 2){
-			colorB = '0' + colorB;
-		}
-		message_list[i].color = ('#' + colorR + colorG + colorB);
-
-		if (message_list[i].timer <= 0) 
-		{
-			delete message_list[i];
-			message_list.splice(i, 1);
-		}
-	}
-
-	for (i = 0; i < monsterball_list.length; i += 1) 
-	{
-		if ((monsterball_list[i].crashWith(myGamePiece) && (myGamePiece.isDead == false))) 
-		{
-			monsterball_list[i].harm(myGamePiece)                 
-			monsterball_list[i].explode();
-			delete monsterball_list[i];
-			monsterball_list.splice(i, 1);      
 		}
 	}
 
@@ -3626,7 +3751,6 @@ function createHighscores()
 	y = myGameArea.canvas.height / 2 - 64;
 	offset = 0;
 
-
 	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
 	lastCreatedComponent.text = 'Your last score is' + ' - ' + _score;
 	offset += 32;
@@ -3644,19 +3768,3 @@ function everyinterval(n) {
 	if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
 	return false;
 }
-
-function sound(src) {
-	this.sound = document.createElement("audio");
-	this.sound.src = src;
-	this.sound.setAttribute("preload", "auto");
-	this.sound.setAttribute("controls", "none");
-	this.sound.style.display = "none";
-	document.body.appendChild(this.sound);
-	this.play = function(){
-		this.sound.play();
-	}
-	this.stop = function(){
-		this.sound.pause();
-	}    
-}
-
