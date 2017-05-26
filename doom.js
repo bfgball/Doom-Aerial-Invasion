@@ -303,7 +303,6 @@ function mainMenu(){
 	if (_killCount > _hkillCount) {
 		_hkillCount = _killCount;
 	}
-	createOptions();
 	createHighscores();
 	purge();
 	myGameArea.resize();
