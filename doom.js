@@ -3719,38 +3719,51 @@ function updateGameArea()
 		{
 			_skull.x = myGameArea.canvas.width/2 - 100 + _cursorExtraOffsetX
 			_skull.y = myGameArea.canvas.height/2 + _cursorOffset + _cursorExtraOffsetY;
-			if (_cursorCooldown<0 && myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) 
+			if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) 
 			{
-				_cursorCooldown = (6 - _cursorCooldown)	
-				_selectedMenu -= 1;		
-				playsound('games/dspstop.mp3');
-				if (_selectedMenu<0)
+				if (_cursorCooldown<0)
 				{
-					_selectedMenu = _menuItemMax
-					_cursorOffset = _menuItemMax * 32;
-				} else {
-					_cursorOffset -= 32;	
+					_cursorCooldown = (6 - _cursorCooldown)	
+					_selectedMenu -= 1;		
+					playsound('games/dspstop.mp3');
+					if (_selectedMenu<0)
+					{
+						_selectedMenu = _menuItemMax
+						_cursorOffset = _menuItemMax * 32;
+					} else {
+						_cursorOffset -= 32;	
+					}
 				}
 			}
-			else if (_cursorCooldown<0 && myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) 
+			else if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) 
 			{
-				_cursorCooldown = (6 - _cursorCooldown)			
-				_selectedMenu += 1;
-				playsound('games/dspstop.mp3');
-				if (_selectedMenu>_menuItemMax)
+				if (_cursorCooldown<0)
 				{
-					_selectedMenu = 0
-					_cursorOffset = 0;
-				} else {
-					_cursorOffset += 32;	
+					_cursorCooldown = (6 - _cursorCooldown)			
+					_selectedMenu += 1;
+					playsound('games/dspstop.mp3');
+					if (_selectedMenu>_menuItemMax)
+					{
+						_selectedMenu = 0
+						_cursorOffset = 0;
+					} else {
+						_cursorOffset += 32;	
+					}
 				}
 			}
+			else {_cursorCooldown=-15}
 		}
 		if (_menuCooldown > 0) {_menuCooldown -= 1;}
-		if (_menuCooldown<=0 && myGameArea.keys && (myGameArea.keys[13]))
+		if (myGameArea.keys && (myGameArea.keys[13]))
 		{
-			_menuCooldown = 20;
-			selectMenu(_selectedMenu);
+			if (_menuCooldown<=0){
+				_menuCooldown = 20;
+				selectMenu(_selectedMenu);
+			}
+		}
+		else
+		{
+			_menuCooldown = 0;
 		}
 	}
 
