@@ -429,6 +429,7 @@ function loadLevel(level)
 		_ground2.transparency = 0;
 		_killCount = 0;
 		_score = 0;
+		myGameArea.resize();
 		break;
 		default:
 		// statements_def
