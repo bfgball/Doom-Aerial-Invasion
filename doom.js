@@ -1068,43 +1068,43 @@ var myGameArea =
 		XScale = XAfter / XBefore;
 		YScale = YAfter / YBefore;
 
-
-		_skybox.x = 0;
-		_skybox.y = 0;
-		_skybox.imageWidth = this.canvas.width;
-		_skybox.imageHeight = this.canvas.height / 2;	
-
-		_skybox2.x = 0;
-		_skybox2.y = 0;
-		_skybox2.imageWidth = this.canvas.width;
-		_skybox2.imageHeight = this.canvas.height / 2;	
-
-		_skyhell.x = 0;
-		_skyhell.y = 0;
-		_skyhell.imageWidth = this.canvas.width;
-		_skyhell.imageHeight = this.canvas.height / 2;	
-
-		_skyhell2.x = 0;
-		_skyhell2.y = 0;
-		_skyhell2.imageWidth = this.canvas.width;
-		_skyhell2.imageHeight = this.canvas.height / 2;	
-
-		_ground.x = 0;
-		_ground.y = this.canvas.height / 2;
-		_ground.imageWidth = this.canvas.width;
-		_ground.imageHeight = this.canvas.height;
-
-		_ground2.x = 0;
-		_ground2.y = this.canvas.height / 2;
-		_ground2.imageWidth = this.canvas.width;
-		_ground2.imageHeight = this.canvas.height;
-
-		_systemMessage.x =  this.canvas.width / 2 - 256;
-		_systemMessage.y =  this.canvas.height / 2;		
 		console.log('NEW WIDTH ' + this.canvas.width + ' / ' + document.body.clientWidth);
 		console.log('NEW HEIGHT ' + this.canvas.height + ' / ' + document.body.clientHeight);
 
 		if (_gameState>0) {
+			_skybox.x = 0;
+			_skybox.y = 0;
+			_skybox.imageWidth = this.canvas.width;
+			_skybox.imageHeight = this.canvas.height / 2;	
+
+			_skybox2.x = 0;
+			_skybox2.y = 0;
+			_skybox2.imageWidth = this.canvas.width;
+			_skybox2.imageHeight = this.canvas.height / 2;	
+
+			_skyhell.x = 0;
+			_skyhell.y = 0;
+			_skyhell.imageWidth = this.canvas.width;
+			_skyhell.imageHeight = this.canvas.height / 2;	
+
+			_skyhell2.x = 0;
+			_skyhell2.y = 0;
+			_skyhell2.imageWidth = this.canvas.width;
+			_skyhell2.imageHeight = this.canvas.height / 2;	
+
+			_ground.x = 0;
+			_ground.y = this.canvas.height / 2;
+			_ground.imageWidth = this.canvas.width;
+			_ground.imageHeight = this.canvas.height;
+
+			_ground2.x = 0;
+			_ground2.y = this.canvas.height / 2;
+			_ground2.imageWidth = this.canvas.width;
+			_ground2.imageHeight = this.canvas.height;
+
+			_systemMessage.x =  this.canvas.width / 2 - 256;
+			_systemMessage.y =  this.canvas.height / 2;		
+
 			myScore.x = this.canvas.width/2 -128;
 			myScore.y = 32; 
 			myLuck.x = this.canvas.width/2 - 320;
@@ -1434,7 +1434,7 @@ function component(width, height, color, x, y, type)
 			ctx.fillStyle = this.color;
 			ctx.fillText(this.text, 0, 0);
 		} 
-		else if (type == "image") {
+		else if (type == "image" && this.image) {
 			ctx.drawImage(this.image, 
 				this.frameX,
 				this.frameY,
@@ -2132,26 +2132,26 @@ var player = function()
 			this.cooldown -= 1;
 			switch (this.currentWeapon) {
 				case 0:
-					myCrosshairH.width = this.cooldown * 3;
-					break;
+				myCrosshairH.width = this.cooldown * 3;
+				break;
 				case 3:
-					myCrosshairH.width = this.cooldown * 5;
-					break;
+				myCrosshairH.width = this.cooldown * 5;
+				break;
 				case 4:
-					myCrosshairH.width = this.cooldown * 2;
-					break;
+				myCrosshairH.width = this.cooldown * 2;
+				break;
 				case 5:
-					myCrosshairH.width = this.cooldown * 8;
-					break;
+				myCrosshairH.width = this.cooldown * 8;
+				break;
 				case 6:
-					myCrosshairH.width = this.cooldown * 2;
-					break;
+				myCrosshairH.width = this.cooldown * 4;
+				break;
 				case 7:
-					myCrosshairH.width = this.cooldown * 2;
-					break;
+				myCrosshairH.width = this.cooldown * 10;
+				break;
 				default:
-					myCrosshairH.width = this.cooldown;
-					break;
+				myCrosshairH.width = this.cooldown;
+				break;
 			}
 			myCrosshairH.color = '#ffff66';
 			myCrosshairV.color = '#ffff66';
