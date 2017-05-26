@@ -10,10 +10,8 @@ var _readme;
 var _option;
 var _rank;
 var _help;
-var _currentMenu;
+
 var _skull;
-var _cursorOffset;
-var _selectedMenu;
 var _menuItemMax;
 var _systemMessage;
 var _cursorCooldown = 0;
@@ -33,7 +31,7 @@ var pickup_list = [];
 var message_list = [];
 var pixel_list = [];
 var pixel_list1 = [];
-var highscores_list = [];
+var menus_list = [];
 var SoundIndex = 0;
 var SoundIndex1 = 0;
 var myGamePiece;
@@ -98,6 +96,34 @@ var _monsterPreferenceMod = [
 //8 Amageddon
 [1, 1, 1, 50]
 ];
+
+var _currentMenu;
+var _menuLevel;
+var _cursorOffset;
+var _cursorExtraOffsetX = 0;
+var _cursorExtraOffsetY = 0;
+var _selectedMenu;
+const M_MAINMENU = 0;
+const M_NEWGAME = 0;
+const M_README = 1;
+const M_OPTION = 2;
+const M_RANK = 3;
+
+var cvar_movement_style = 0;
+const C_MOVEMENT_DEFAULT = 0;
+const C_MOVEMENT_PRECISE = 1;
+const C_MOVEMENT_HEAVY = 2;
+
+const TEXT_MOVEMENT_STYLE = ['Hoverboard' , 'DooM', 'Call of Duty'];
+
+var cvar_crosshair_style = 0;
+const C_CROSSHAIR_DEFAULT = 0;
+const C_CROSSHAIR_THICK = 1;
+const C_CROSSHAIR_NONE = 2;
+
+const TEXT_CROSSHAIR_STYLE = ['Default','Thick','None'];
+
+
 
 const PI = 3.1415926535897932384626433832795;
 
@@ -277,6 +303,7 @@ function mainMenu(){
 	if (_killCount > _hkillCount) {
 		_hkillCount = _killCount;
 	}
+	createOptions();
 	createHighscores();
 	purge();
 	myGameArea.resize();
@@ -407,10 +434,28 @@ function loadLevel(level)
 		myDmg = new component("12px", "DooM", "white", myGameArea.canvas.width/2 - 128, 64, "text");
 		myKill = new component("12px", "DooM", "white", myGameArea.canvas.width/2 + 64, 64, "text");
 		myHealth = new component("16px", "mortis", "#99ff99", 0, 0, "text");
-		myCrosshairH = new component(16, 2, "#99ff99", 0, 0, "");
-		lastCreatedComponent.transparency = 0.75;
-		myCrosshairV = new component(2, 16, "#99ff99", 0, 0, "");
-		lastCreatedComponent.transparency = 0.75;
+		switch (cvar_crosshair_style) {
+			case C_CROSSHAIR_DEFAULT:
+			myCrosshairH = new component(16, 2, "#99ff99", 0, 0, "");
+			lastCreatedComponent.transparency = 0.75;
+			myCrosshairV = new component(2, 16, "#99ff99", 0, 0, "");
+			lastCreatedComponent.transparency = 0.75;
+			break;
+			case C_CROSSHAIR_THICK:
+			myCrosshairH = new component(16, 4, "#99ff99", 0, 0, "");
+			lastCreatedComponent.transparency = 0.75;
+			myCrosshairV = new component(4, 16, "#99ff99", 0, 0, "");
+			lastCreatedComponent.transparency = 0.75;
+			break;
+			case C_CROSSHAIR_NONE:
+			myCrosshairH = new component(16, 2, "#99ff99", 0, 0, "");
+			lastCreatedComponent.transparency = 0.0;
+			myCrosshairV = new component(2, 16, "#99ff99", 0, 0, "");
+			lastCreatedComponent.transparency = 0.0;
+			//I am a lazy piece of shit
+			break;
+		}
+
 		myAmmoCounter = new component("16px", "mortis", "yellow", 0, 0, "text");
 		myWeapon = new component(80, 36, "games/player/Pistol.png", 0, 0, "image");
 		myScouter = new component("16px", "mortis", "#888800", 0, 0, "text");
@@ -1153,7 +1198,7 @@ var myGameArea =
 			_rank.x = this.canvas.width/2;
 			_rank.y = this.canvas.height/2 + 96;
 
-			_skull.x = this.canvas.width/2 - 100;
+			_skull.x = this.canvas.width/2 - 100
 			_skull.y = this.canvas.height/2 + _cursorOffset;
 
 			_help.x = this.canvas.width/2;
@@ -1623,14 +1668,28 @@ HUD.prototype.constructor = player;
 var player = function()
 {
 	component.apply(this,arguments);
-	this.friction = 0.99;
+
 	this.cooldown = 0;
 	this.isFiring = false;
 	this.holdFire = false;
 	this.usingAmmo = false;
 	this.pauseFire = 0;
 	this.runSpeed = 0;
-	this.speed = 0.5;
+
+	switch (cvar_movement_style) {
+		case C_MOVEMENT_DEFAULT:
+		this.friction = 0.99;
+		this.speed = 0.5;
+		break;
+		case C_MOVEMENT_PRECISE:
+		this.friction = 0.95;
+		this.speed = 1;
+		break;
+		case C_MOVEMENT_HEAVY:
+		this.friction = 0.90;
+		this.speed = 1.33;
+		break;
+	}
 	this.weaponSwitchCooldown = 0;
 	this.painChance = 101;
 	this.weapon = [         'Pistol','Shotgun','SuperShotgun','Chaingun','RocketLauncher','PlasmaRifle','BFG9000','BFG10K'];
@@ -3629,8 +3688,9 @@ function updateGameArea()
 	} 
 	else if(_gameState == 0)
 	{
+
 		switch (_currentMenu) {
-			case 0:
+			case M_MAINMENU:
 			_logo.update();
 			_newGame.update();
 			_readme.update();
@@ -3638,16 +3698,14 @@ function updateGameArea()
 			_rank.update();
 			_skull.update();
 			break;
-			case 1:
+			case M_README:
 			_help.update();
 			break;
-			case 2:
-			
-			break;
-			case 3:
-			for (var i = highscores_list.length - 1; i >= 0; i--) {
-				highscores_list[i].update();
-
+			case M_OPTION:
+			_skull.update();
+			case M_RANK:
+			for (var i = menus_list.length - 1; i >= 0; i--) {
+				menus_list[i].update();
 			}
 			break;
 			default:
@@ -3657,75 +3715,43 @@ function updateGameArea()
 
 		if(_cursorCooldown > -15) {_cursorCooldown -= 1;}
 		_skull.y = myGameArea.canvas.height/2 + _cursorOffset;
-		if (_cursorCooldown<0 && myGameArea.keys && _currentMenu == 0 && (myGameArea.keys[38] || myGameArea.keys[87])) 
+
+		if (_currentMenu == M_MAINMENU || _currentMenu == M_OPTION)
 		{
-			_cursorCooldown = (6 - _cursorCooldown)	
-			_selectedMenu -= 1;		
-			playsound('games/dspstop.mp3');
-			if (_selectedMenu<0)
+			_skull.x = myGameArea.canvas.width/2 - 100 + _cursorExtraOffsetX
+			_skull.y = myGameArea.canvas.height/2 + _cursorOffset + _cursorExtraOffsetY;
+			if (_cursorCooldown<0 && myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) 
 			{
-				_selectedMenu = _menuItemMax
-				_cursorOffset = _menuItemMax * 32;
-			} else {
-				_cursorOffset -= 32;	
+				_cursorCooldown = (6 - _cursorCooldown)	
+				_selectedMenu -= 1;		
+				playsound('games/dspstop.mp3');
+				if (_selectedMenu<0)
+				{
+					_selectedMenu = _menuItemMax
+					_cursorOffset = _menuItemMax * 32;
+				} else {
+					_cursorOffset -= 32;	
+				}
 			}
-		}
-		else if (_cursorCooldown<0 && myGameArea.keys && _currentMenu == 0 && (myGameArea.keys[40] || myGameArea.keys[83])) 
-		{
-			_cursorCooldown = (6 - _cursorCooldown)			
-			_selectedMenu += 1;
-			playsound('games/dspstop.mp3');
-			if (_selectedMenu>_menuItemMax)
+			else if (_cursorCooldown<0 && myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) 
 			{
-				_selectedMenu = 0
-				_cursorOffset = 0;
-			} else {
-				_cursorOffset += 32;	
+				_cursorCooldown = (6 - _cursorCooldown)			
+				_selectedMenu += 1;
+				playsound('games/dspstop.mp3');
+				if (_selectedMenu>_menuItemMax)
+				{
+					_selectedMenu = 0
+					_cursorOffset = 0;
+				} else {
+					_cursorOffset += 32;	
+				}
 			}
 		}
 		if (_menuCooldown > 0) {_menuCooldown -= 1;}
 		if (_menuCooldown<=0 && myGameArea.keys && (myGameArea.keys[13]))
 		{
 			_menuCooldown = 20;
-			playsound('games/player/DSTPFIR.mp3');
-			switch (_currentMenu) {
-				case 0:
-				switch (_selectedMenu) {
-					case 0:
-					loadLevel(1);
-					break;
-					case 1:
-					_currentMenu = 1;
-					break;
-					case 2:
-					_currentMenu = 2;
-					break;
-					case 3:
-					_currentMenu = 3;
-					createHighscores();
-					break;
-					default:
-					// statements_def
-					break;
-				}
-				break;
-				case 1:
-				_currentMenu = 0;
-				break;
-				case 2:
-				_currentMenu = 0;
-				break;
-				case 3:
-				_currentMenu = 0;
-				for (var i = highscores_list.length - 1; i >= 0; i--) 
-				{
-					delete highscores_list[i];
-					highscores_list.splice(i, 1);
-				}
-				break;
-			}
-			// console.log('Menu   - ' + _currentMenu);
-			// console.log('Select - ' + _selectedMenu);
+			selectMenu(_selectedMenu);
 		}
 	}
 
@@ -3746,24 +3772,120 @@ function updateGameArea()
 	checkEvent();
 }
 
+function selectMenu(index)
+{
+	playsound('games/player/DSTPFIR.mp3');
+	switch (_currentMenu) {
+		case M_MAINMENU:
+		switch (index) {
+			case M_NEWGAME:
+			loadLevel(1);
+			break;
+			case M_README:
+			_currentMenu = M_README;
+			break;
+			case M_OPTION:
+			_currentMenu = M_OPTION;
+			createOptions();
+			_cursorExtraOffsetX = -64;
+			_cursorExtraOffsetY = -8;
+			_selectedMenu = 0;
+			_cursorOffset = 0;
+			_menuItemMax = 2;
+			break;
+			case M_RANK:
+			_currentMenu = M_RANK;
+			createHighscores();
+			break;
+			default:
+			// statements_def
+			break;
+		}
+		break;
+		case M_README:
+		case M_RANK:
+		_currentMenu = M_MAINMENU;
+		for (var i = menus_list.length - 1; i >= 0; i--) 
+		{
+			delete menus_list[i];
+			menus_list.splice(i, 1);
+		}
+		break;
+		case M_OPTION:
+		switch (index) {
+			case 0:
+			if (cvar_movement_style < 2)
+			{
+				cvar_movement_style += 1;
+			} else {
+				cvar_movement_style = 0
+			}
+			menus_list[0].text = 'Movement Style - ' + TEXT_MOVEMENT_STYLE[cvar_movement_style];
+
+			break;
+			case 1:
+			if (cvar_crosshair_style < 2)
+			{
+				cvar_crosshair_style += 1;
+			} else {
+				cvar_crosshair_style = 0
+			}
+			menus_list[1].text = 'Crosshair Style - ' + TEXT_CROSSHAIR_STYLE[cvar_crosshair_style];
+
+			break;
+			case 2:
+			_selectedMenu = 2;
+			_cursorOffset = 64;
+			_currentMenu = M_MAINMENU;
+			_menuItemMax = 3;
+			_cursorExtraOffsetX = 0;
+			_cursorExtraOffsetY = 0;
+			for (var i = menus_list.length - 1; i >= 0; i--) 
+			{
+				delete menus_list[i];
+				menus_list.splice(i, 1);
+			}
+			break;
+		}
+		break;
+	}
+}
+
 function createHighscores()
 {
 	x = myGameArea.canvas.width / 2 - 128;
 	y = myGameArea.canvas.height / 2 - 64;
 	offset = 0;
 
-	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-	lastCreatedComponent.text = 'Your last score is' + ' - ' + _score;
+	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your last score is - ' + _score;
 	offset += 32;
-	highscores_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-	lastCreatedComponent.text = 'Your last kill count is' + ' - ' + _killCount;
+	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your last kill count is - ' + _killCount;
 	offset += 32;
-	highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
-	lastCreatedComponent.text = 'Your highest score is' + ' - ' + _hscore;
+	menus_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your highest score is - ' + _hscore;
 	offset += 32;
-	highscores_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
-	lastCreatedComponent.text = 'Your highest kill count is' + ' - ' + _hkillCount;
+	menus_list.push(new component("16px", "DooM", '#ffff00', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Your highest kill count is - ' + _hkillCount;
 }
+
+function createOptions()
+{
+	x = myGameArea.canvas.width / 2 - 128;
+	y = myGameArea.canvas.height / 2;
+	offset = 0;
+
+	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Movement Style - ' + TEXT_MOVEMENT_STYLE[cvar_movement_style];
+	offset += 32;
+	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = 'Crosshair Style - ' + TEXT_CROSSHAIR_STYLE[cvar_crosshair_style];
+	offset += 32;
+	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
+	lastCreatedComponent.text = '<< Back';
+}
+
 
 function everyinterval(n) {
 	if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
