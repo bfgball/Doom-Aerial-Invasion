@@ -1434,7 +1434,7 @@ function component(width, height, color, x, y, type)
 			ctx.fillStyle = this.color;
 			ctx.fillText(this.text, 0, 0);
 		} 
-		else if (type == "image" && this.image) {
+		else if (type == "image") {
 			ctx.drawImage(this.image, 
 				this.frameX,
 				this.frameY,
