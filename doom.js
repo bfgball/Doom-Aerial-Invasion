@@ -5,11 +5,17 @@ var _skyhell2;
 var _ground;
 var _ground2;
 var _logo;
-var _newGame;
-var _readme;
-var _option;
-var _rank;
+var _mouseObject
 var _help;
+var mouseX;
+var mouseY;
+var mouseClicked = false;
+var mouseRightClicked = false;
+var mouseHold = false;
+var mouseRightHold = false;
+var moveX;
+var moveY;
+var mouseMove = 0;
 
 var _skull;
 var _menuItemMax;
@@ -31,6 +37,7 @@ var pickup_list = [];
 var message_list = [];
 var pixel_list = [];
 var pixel_list1 = [];
+var menus_list0 = [];
 var menus_list = [];
 var SoundIndex = 0;
 var SoundIndex1 = 0;
@@ -246,14 +253,9 @@ function startGame() {
 	_skyhell = new component(256, 128, "games/RSKY2.png", 0, 0, "background");
 	_skyhell2 = new component(256, 128, "games/RSKY2.png", 0, 0, "background");
 	_ground = new component(256, 256, "games/floor1.png", 0, 0, "background");
-	_ground2 = new component(256, 256, "games/floor2.png", 0, 0, "background");	
-	_logo = new component(256, 192, "games/logo.png", 0, 0, "image");
-	_newGame = new component(140, 20, "games/M_NGAME.png", 0, 0, "image");
-	_readme = new component(140, 20, "games/M_READ.png", 0, 0, "image");
-	_option =  new component(140, 20, "games/M_OPTION.png", 0, 0, "image");
-	_rank = new component(140, 20, "games/M_RANK.png", 0, 0, "image");
-	_help = new component(360, 240, "games/help.png", 0, 0, "image");
-	_skull = new component(20, 19, "games/M_SKULL.png", 0, 0, "image");
+	_ground2 = new component(256, 256, "games/floor2.png", 0, 0, "background");
+	_mouseObject = new component(2, 2, "#00ff00", 0, 0, "");		
+	createMainMenu();
 	_systemMessage = new component("16px", "DooM", '#ffffff', 0, 0, "text");
 	_currentMenu = 0;
 	_selectedMenu = 0;
@@ -271,13 +273,7 @@ function startGame() {
 
 function mainMenu(){
 	_gameState = 0;
-	_logo = new component(256, 192, "games/logo.png", 0, 0, "image");
-	_newGame = new component(140, 20, "games/M_NGAME.png", 0, 0, "image");
-	_readme = new component(140, 20, "games/M_READ.png", 0, 0, "image");
-	_option =  new component(140, 20, "games/M_OPTION.png", 0, 0, "image");
-	_rank = new component(140, 20, "games/M_RANK.png", 0, 0, "image");
-	_help = new component(360, 240, "games/help.png", 0, 0, "image");
-	_skull = new component(20, 19, "games/M_SKULL.png", 0, 0, "image");
+	createMainMenu();
 	delete myGamePiece;
 	delete myScore;
 	delete myLuck;
@@ -416,10 +412,11 @@ function resizeGame()
 function loadLevel(level)
 {
 	delete _logo;
-	delete _newGame;
-	delete _readme;
-	delete _option;
-	delete _rank;
+	clearMenus();
+	for (var i = menus_list0.length - 1; i >= 0; i--) {
+		delete menus_list0[i];
+		menus_list0.splice(i, 1);
+	}
 	delete _help;
 	delete _skull;
 	switch (level) {
@@ -1060,6 +1057,36 @@ function deathDrop(rarity,x,y,chance)
 	}
 }
 
+function doMouseDown(event)
+{
+	{
+		if (event.button === 0) {
+			mouseX = event.pageX;
+			mouseY = event.pageY;	
+			mouseClicked = true;
+			mouseHold = true;
+			_mouseObject.x = event.pageX;
+			_mouseObject.y = event.pageY;     
+		}
+		if (event.button === 2) {
+			mouseRightClicked = true;   
+			mouseRightHold = true;
+		}
+	}
+}
+
+function doMouseUp(event)
+{
+	{
+		if (event.button === 0) {
+			mouseHold = false;
+		}
+		if (event.button === 2) {
+			mouseRightHold = false;
+		}
+	}
+}
+
 
 var myGameArea = 
 {
@@ -1084,6 +1111,8 @@ var myGameArea =
 			{
 				myGameArea.keys[e.keyCode] = (e.type == "keydown");
 			})
+		window.addEventListener('mousedown', doMouseDown, false);
+		window.addEventListener('mouseup', doMouseUp, false);
 	},
 	clear : function() 
 	{
@@ -1185,17 +1214,10 @@ var myGameArea =
 			_logo.x = this.canvas.width/2;
 			_logo.y = this.canvas.height/2 - 128;
 
-			_newGame.x = this.canvas.width/2;
-			_newGame.y = this.canvas.height/2;
-
-			_readme.x = this.canvas.width/2;
-			_readme.y = this.canvas.height/2 + 32;
-
-			_option.x = this.canvas.width/2;
-			_option.y = this.canvas.height/2 + 64;
-
-			_rank.x = this.canvas.width/2;
-			_rank.y = this.canvas.height/2 + 96;
+			for (var i = 0; i < menus_list0.length; i++) {
+				menus_list0[i].x = this.canvas.width/2;
+				menus_list0[i].y = this.canvas.height/2 + (i*32);
+			}
 
 			_skull.x = this.canvas.width/2 - 100
 			_skull.y = this.canvas.height/2 + _cursorOffset;
@@ -1451,7 +1473,6 @@ function component(width, height, color, x, y, type)
 	{
 		dist = Math.sqrt(((this.x - target.x)*(this.x - target.x)) + ((this.y - target.y)*(this.y - target.y)))
 		return dist;	
-
 	}
 	this.push = function(target,strength) {
 		dist = Math.sqrt(((this.x - target.x)*(this.x - target.x)) + ((this.y - target.y)*(this.y - target.y)))
@@ -1538,6 +1559,34 @@ function component(width, height, color, x, y, type)
 		}
 		return crash;
 	}
+	function getTextWidth(text, font) {
+		// re-use canvas object for better performance
+		var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+		var context = canvas.getContext("2d");
+		context.font = font;
+		var metrics = context.measureText(text);
+		return metrics.width;
+	}
+	this.textCrashWith = function(otherobj) {
+		var myleft = this.x;
+		var myright = this.x + this.imageWidth;
+		var mytop = this.y - this.imageHeight;
+		var mybottom = this.y + this.imageHeight;
+		var otherleft = otherobj.x - (otherobj.width / 2);
+		var otherright = otherobj.x + (otherobj.width / 2);
+		var othertop = otherobj.y - (otherobj.height / 2);
+		var otherbottom = otherobj.y + (otherobj.height / 2);
+		console.log('myleft ' + myleft);
+		console.log('myright ' + myright);
+		console.log('mytop ' + mytop);
+		console.log('mybottom ' + mybottom);
+		var crash = true;
+		if (mybottom < othertop || mytop > otherbottom || myright < otherleft || myleft > otherright || this.isDead == true || otherobj.isDead == true) {
+			crash = false;
+		}
+		return crash;
+	}
+
 	this.boundCheck = function()
 	{
 		if (this.boundCheckImmunityTime> -1) {this.boundCheckImmunityTime -= 1;}
@@ -1703,6 +1752,29 @@ var player = function()
 	this.weaponState = 0;
 	this.tracerAttackNextFrame = false;
 	this.isCharging = false;
+	this.mouseMove = function()
+	{	
+		dist = Math.sqrt(((this.x - moveX)*(this.x - moveX)) + ((this.y - moveY)*(this.y - moveY)))
+		radius = 32;
+		dX = Math.asin((this.x - moveX)/dist);
+		dY = Math.acos((this.y - moveY)/dist) - (PI * 0.5);
+		speed0 = Math.sqrt((this.speedX*this.speedX)+(this.speedY*this.speedY)) * 10;
+		if (dist<radius || speed0>dist)
+		{
+			this.accelerationX = 0;
+			this.accelerationY = 0;
+			this.speedX = this.speedX*(0.75 + 0.99 - this.friction);
+			this.speedY = this.speedY*(0.75 + 0.99 - this.friction);
+		}
+		else {
+			this.accelerationX = -(this.speed * dX);
+			this.accelerationY = (this.speed * dY);	
+		}
+
+		// this.speedX = -(this.speed * dX);
+		// this.speedY = (this.speed * dY);	
+		// console.log(dY);
+	}
 	this.player_switch = function(index)
 	{
 		if (this.weaponSwitchCooldown <= 0)
@@ -1733,7 +1805,7 @@ var player = function()
 				myMessage.text = "Can't change weapon while firing";
 				return false;
 			}
-			
+
 			this.weaponState = 0;
 			this.usingAmmo = false;
 			this.currentWeapon = index;
@@ -3266,6 +3338,52 @@ function updateGameArea()
 	// 	console.log('MONSTERS[] ' + monsters_list.length)
 	// 	console.log('MONSTER_BALL[] ' + monsterball_list.length)
 	// 	console.log('EFFECT[] ' + effect_list.length)
+	if(mouseClicked == true)
+	{
+		if (_gameState == 0)
+		{
+			switch (_currentMenu) {
+				case M_MAINMENU:
+				for (var i = menus_list0.length - 1; i >= 0; i--) {
+					if (menus_list0[i].crashWith(_mouseObject))
+					{
+						selectMenu(menus_list0[i].state);
+					}
+				}
+				break;
+				case M_OPTION:
+				for (var i = 0; i < menus_list.length; i++) {
+					if (menus_list[i].textCrashWith(_mouseObject))
+					{
+						selectMenu(i);
+					}
+				}
+				break;
+				case M_README:
+				case M_RANK:
+				selectMenu(0);
+				break;
+			}
+			mouseClicked = false;
+		} else if (_gameState > 0) {
+			if (mouseY > myGameArea.canvas.height / 2)
+			{
+				moveX = _mouseObject.x;
+				moveY = _mouseObject.y;
+				mouseMove = 100;
+			}
+		}
+		mouseClicked = false;
+	}
+
+	if(mouseRightClicked == true)
+	{
+		if (_gameState > 0)
+		{
+
+		}
+		mouseRightClicked = false;
+	}
 
 	if (_gameState > 0)
 	{
@@ -3358,10 +3476,26 @@ function updateGameArea()
 		myGamePiece.accelerationY = 0;          
 		myGamePiece.isFiring = false;
 
-		if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[65])) {myGamePiece.accelerationX = -myGamePiece.speed; }
-		if (myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[68])) {myGamePiece.accelerationX = myGamePiece.speed; }
-		if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) {myGamePiece.accelerationY= -myGamePiece.speed; }
-		if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) {myGamePiece.accelerationY= myGamePiece.speed; }
+		if (myGameArea.keys && (myGameArea.keys[37] || myGameArea.keys[65])) 
+		{
+			myGamePiece.accelerationX = -myGamePiece.speed; 
+			mouseMove = 0;
+		}
+		if (myGameArea.keys && (myGameArea.keys[39] || myGameArea.keys[68]))
+		{
+			myGamePiece.accelerationX = myGamePiece.speed; 
+			mouseMove = 0;
+		}
+		if (myGameArea.keys && (myGameArea.keys[38] || myGameArea.keys[87])) 
+		{
+			myGamePiece.accelerationY= -myGamePiece.speed; 
+			mouseMove = 0;
+		}
+		if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) 
+		{
+			myGamePiece.accelerationY= myGamePiece.speed;
+			mouseMove = 0;
+		}
 
 		if (myGameArea.keys && (myGameArea.keys[16] || myGameArea.keys[13])) {myGamePiece.isFiring = true; }
 
@@ -3514,9 +3648,19 @@ function updateGameArea()
 		}
 
 		if (myGamePiece.isDead == false) {
+			if (mouseMove > 0)
+			{
+				myGamePiece.mouseMove();
+				mouseMove -= 1;
+			}
+			if (mouseHold == true && mouseY < Math.floor(myGameArea.canvas.height / 2))
+			{
+				myGamePiece.isFiring = true;
+			}
 			myGamePiece.player_update();
 			myGamePiece.newPos();
 			myGamePiece.update();
+			_mouseObject.update();
 		}
 
 		if (everyinterval(10)) {
@@ -3683,7 +3827,6 @@ function updateGameArea()
 			myScouter.update();
 			scouterHidden -= 1;
 		}
-
 	} 
 	else if(_gameState == 0)
 	{
@@ -3691,10 +3834,9 @@ function updateGameArea()
 		switch (_currentMenu) {
 			case M_MAINMENU:
 			_logo.update();
-			_newGame.update();
-			_readme.update();
-			_option.update();
-			_rank.update();
+			for (var i = menus_list0.length - 1; i >= 0; i--) {
+				menus_list0[i].update();
+			}
 			_skull.update();
 			break;
 			case M_README:
@@ -3751,8 +3893,11 @@ function updateGameArea()
 					}
 				}
 			}
-			else {_cursorCooldown=-15}
+			else {
+				_cursorCooldown=-15
+			}
 		}
+
 		if (_menuCooldown > 0) {_menuCooldown -= 1;}
 		if (myGameArea.keys && (myGameArea.keys[13]))
 		{
@@ -3817,11 +3962,7 @@ function selectMenu(index)
 		case M_README:
 		case M_RANK:
 		_currentMenu = M_MAINMENU;
-		for (var i = menus_list.length - 1; i >= 0; i--) 
-		{
-			delete menus_list[i];
-			menus_list.splice(i, 1);
-		}
+		clearMenus();
 		break;
 		case M_OPTION:
 		switch (index) {
@@ -3852,17 +3993,35 @@ function selectMenu(index)
 			_menuItemMax = 3;
 			_cursorExtraOffsetX = 0;
 			_cursorExtraOffsetY = 0;
-			for (var i = menus_list.length - 1; i >= 0; i--) 
-			{
-				delete menus_list[i];
-				menus_list.splice(i, 1);
-			}
+			clearMenus();
 			break;
 		}
 		break;
 	}
 }
 
+function clearMenus()
+{
+	for (var i = menus_list.length - 1; i >= 0; i--) 
+	{
+		delete menus_list[i];
+		menus_list.splice(i, 1);
+	}
+}
+function createMainMenu()
+{
+	_logo = new component(256, 192, "games/logo.png", 0, 0, "image");
+	menus_list0.push(new component(140, 20,"games/M_NGAME.png", 0, 0, "image"));
+	lastCreatedComponent.state = M_NEWGAME;
+	menus_list0.push(new component(140, 20,"games/M_READ.png", 0, 0, "image"));
+	lastCreatedComponent.state = M_README;
+	menus_list0.push(new component(140, 20,"games/M_OPTION.png", 0, 0, "image"));
+	lastCreatedComponent.state = M_OPTION;
+	menus_list0.push(new component(140, 20,"games/M_RANK.png", 0, 0, "image"));
+	lastCreatedComponent.state = M_RANK;
+	_help = new component(360, 240,"games/help.png", 0, 0, "image");
+	_skull = new component(20, 19, "games/M_SKULL.png", 0, 0, "image");
+}
 function createHighscores()
 {
 	x = myGameArea.canvas.width / 2 - 128;
@@ -3890,12 +4049,18 @@ function createOptions()
 
 	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
 	lastCreatedComponent.text = 'Movement Style - ' + TEXT_MOVEMENT_STYLE[cvar_movement_style];
+	lastCreatedComponent.imageWidth = 320;
+	lastCreatedComponent.imageHeight = 12;
 	offset += 32;
 	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
 	lastCreatedComponent.text = 'Crosshair Style - ' + TEXT_CROSSHAIR_STYLE[cvar_crosshair_style];
+	lastCreatedComponent.imageWidth = 320;
+	lastCreatedComponent.imageHeight = 12;
 	offset += 32;
 	menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
 	lastCreatedComponent.text = '<< Back';
+	lastCreatedComponent.imageWidth = 100;
+	lastCreatedComponent.imageHeight = 12;
 }
 
 
