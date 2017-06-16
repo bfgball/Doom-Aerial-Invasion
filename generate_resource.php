@@ -22,17 +22,17 @@
 		}
 		loadResource($path);
 
-		// foreach ($resource as $key => $value) {
-		// 	echo '"';
-		// 	echo $value;
-		// 	echo '"';
-		// 	echo ',';
-		// 	echo '<br>';
-		// }
-
 		foreach ($resource as $key => $value) {
-			echo 'background-image: url(';
+			echo '"';
 			echo $value;
-			echo ');';
+			echo '"';
+			echo ',';
 			echo '<br>';
 		}
+
+		// foreach ($resource as $key => $value) {
+		// 	echo 'background-image: url(';
+		// 	echo $value;
+		// 	echo ');';
+		// 	echo '<br>';
+		// }
