@@ -3583,7 +3583,7 @@ var bfgball2 = function()
 					dist = targetDist;
 				}
 			}
-			if (targetMonster && dist<500)
+			if (targetMonster && dist<1000)
 			{
 				lines_list.push(new line('#aaffaa',this.x,this.y,targetMonster.x,targetMonster.y,4,10));
 				if (targetMonster.isBoss)
