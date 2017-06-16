@@ -7030,8 +7030,9 @@ function updateGameArea()
 							}
 							_cursorOffset = _selectedMenu * _skullStep;	
 						}
-						//console.log('selected_level  ' + _selectLevel);
-						//console.log('selected_menu   ' + _selectedMenu);
+						// console.log('selected_level  ' + _selectLevel);
+						// console.log('selected_menu   ' + _selectedMenu);
+						// console.log('max_level  ' + _maxLevel);
 					}
 				}
 				else if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) 
@@ -7203,7 +7204,7 @@ function updateGameArea()
 				_cursorOffset = 0;
 				_menuItemMax = 2;
 				_maxLevel = _gameProgress;
-				if (_maxLevel > 4);
+				if (_maxLevel > 4)
 				{
 					_maxLevel = 4;
 				}
