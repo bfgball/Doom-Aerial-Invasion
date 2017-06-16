@@ -22,11 +22,14 @@
 			border:0px solid #000000;
 			background-color: #000000;
 		}
+<<<<<<< HEAD
 		#preloadedImages {
 			width: 0px;
 			height: 0px;
 			display: inline;
 		}
+=======
+>>>>>>> 0e94fc77cd693d89fbbfb60624c1244e9d0d85bd
 	</style>
 </head>
 <body onresize='resizeGame()'>
@@ -281,8 +284,8 @@
 			});
 			function preloadImage(url, anImageLoadedCallback){
 				var img = new Image();
-				img.src = url;
 				img.onload = anImageLoadedCallback;
+				img.src = url;
 			}
 		}
 
