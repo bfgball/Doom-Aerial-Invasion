@@ -26,6 +26,18 @@ if(typeof(Storage) !== "undefined")
 		score = [0,0,0,0,0];
 		localStorage.score = score;
 	}
+	if (!localStorage.cvarDifficulty)
+	{
+		localStorage.cvarDifficulty = 2;
+	}
+	if (!localStorage.cvarCrosshairStyle)
+	{
+		localStorage.cvarCrosshairStyle = 0;	
+	}
+	if (!localStorage.cvarMovementStyle)
+	{
+		localStorage.cvarMovementStyle = 1;	
+	}
 } else 
 {
 	alert("Sorry, your browser does not support web storage... so you may not save your progress")
@@ -33,6 +45,9 @@ if(typeof(Storage) !== "undefined")
 	localStorage.shop  = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 	localStorage.progress = 0;
 	localStorage.upgrade = [0,0,0,0,0,0,0];
+	localStorage.cvarDifficulty = 2;
+	localStorage.cvarCrosshairStyle = 0;	
+	localStorage.cvarMovementStyle = 1;	
 }
 
 
@@ -193,28 +208,29 @@ const M_UPGRADE = 5;
 const M_SHOP = 6;
 const M_GAME = 7;
 
-var cvar_movement_style = 1;
+var cvar_movement_style = Number(localStorage.cvarMovementStyle);
 const C_MOVEMENT_DEFAULT = 0;
 const C_MOVEMENT_PRECISE = 1;
 const C_MOVEMENT_HEAVY = 2;
 
 const TEXT_MOVEMENT_STYLE = ['Hoverboard' , 'DooM', 'Call of Duty'];
 
-var cvar_crosshair_style = 0;
+var cvar_crosshair_style = Number(localStorage.cvarCrosshairStyle);
 const C_CROSSHAIR_DEFAULT = 0;
 const C_CROSSHAIR_THICK = 1;
 const C_CROSSHAIR_NONE = 2;
 
 const TEXT_CROSSHAIR_STYLE = ['Default','Thick','None'];
 
-var cvar_difficulty = 2;
+var cvar_difficulty = Number(localStorage.cvarDifficulty);
+const C_DIFFICULTY_GRANDPA = -1;
 const C_DIFFICULTY_BABY = 0;
 const C_DIFFICULTY_EASY = 1;
 const C_DIFFICULTY_MEDIUM = 2;
 const C_DIFFICULTY_HARD = 3;
 const C_DIFFICULTY_VHARD = 4;
 
-const TEXT_DIFFICULTY = ['Too young to Die','Not too Rough','Hurt me Plenty','Ultra-Violence','Nightmare!'];
+const TEXT_DIFFICULTY = ['Grandpa Mode','Too young to Die','Not too Rough','Hurt me Plenty','Ultra-Violence','Nightmare!'];
 
 const PI = 3.1415926535897932384626433832795;
 
@@ -3281,6 +3297,10 @@ var player = function()
 		{
 			this.resistance = this.resistance * 0.5;
 		}
+		else if (cvar_difficulty == -1)
+		{
+			this.resistance = this.resistance * 0.125;
+		}
 
 		if (this.hasPower[1] && this.powerups[1] % 60 == 0)
 		{
@@ -3369,7 +3389,10 @@ var player = function()
 						{
 							playsound('games/powerups/damage3.mp3',SOUND_CHANNEL_QDMG);
 						}
-						this.useAmmo();
+						if (cvar_difficulty >= 0)
+						{
+							this.useAmmo();
+						}
 					} else {
 						myCrosshairH.color = '#ff9999';
 						myCrosshairV.color = '#ff9999';
@@ -7246,6 +7269,7 @@ function updateGameArea()
 				} else {
 					cvar_movement_style = 0
 				}
+				localStorage.cvarMovementStyle = cvar_movement_style;
 				menus_list[0].text = 'Movement Style - ' + TEXT_MOVEMENT_STYLE[cvar_movement_style];
 
 				break;
@@ -7256,6 +7280,7 @@ function updateGameArea()
 				} else {
 					cvar_crosshair_style = 0
 				}
+				localStorage.cvarCrosshairStyle = cvar_crosshair_style;
 				menus_list[1].text = 'Crosshair Style - ' + TEXT_CROSSHAIR_STYLE[cvar_crosshair_style];
 
 				break;
@@ -7264,9 +7289,10 @@ function updateGameArea()
 				{
 					cvar_difficulty += 1;
 				} else {
-					cvar_difficulty = 0
+					cvar_difficulty = -1
 				}
-				menus_list[2].text = 'Game Difficult - ' + TEXT_DIFFICULTY[cvar_difficulty];
+				localStorage.cvarDifficulty = cvar_difficulty;
+				menus_list[2].text = 'Game Difficult - ' + TEXT_DIFFICULTY[cvar_difficulty + 1];
 
 				break;
 				case 3:
@@ -7801,7 +7827,7 @@ function updateGameArea()
 		lastCreatedComponent.imageHeight = 12;
 		offset += 32;
 		menus_list.push(new component("16px", "DooM", '#ff0000', x, y + offset, "text"));
-		lastCreatedComponent.text = 'Game Difficult - ' + TEXT_DIFFICULTY[cvar_difficulty];;
+		lastCreatedComponent.text = 'Game Difficult - ' + TEXT_DIFFICULTY[cvar_difficulty + 1];;
 		lastCreatedComponent.imageWidth = 100;
 		lastCreatedComponent.imageHeight = 12;
 		offset += 32;
