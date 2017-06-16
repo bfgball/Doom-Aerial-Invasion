@@ -3,7 +3,6 @@
 Credits :
 (Incomplete)
 sprites:
-{
 Id Software
 3DRealms
 Beaublen
@@ -19,12 +18,10 @@ Vader
 Xaser 
 yuraofthehairfan
 zrrion the insect
-}
+
 
 Sounds:
-{
 Id Software
 Raven Software
 Midway Software
 Monolith Producties
-}
