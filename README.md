@@ -2,7 +2,8 @@
 
 Credits :
 (Incomplete)
-sprites:
+
+Sprites:
 Id Software
 3DRealms
 Beaublen
