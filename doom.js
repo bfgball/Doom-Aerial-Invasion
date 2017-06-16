@@ -169,8 +169,8 @@ for (var i = _useUpgrade.length - 1; i >= 0; i--) {
 		_useUpgrade[i] = true;
 	}
 }
-console.log(localStorage.upgrade);
-console.log(_useUpgrade);
+//console.log(localStorage.upgrade);
+//console.log(_useUpgrade);
 var _tier1WeaponName = ['Pistol','Shotgun','SuperShotgun','Chaingun','RocketLauncher','PlasmaRifle','BFG9000','BFG10K'];
 var _tier2WeaponName = ['Repeater','AutoShotgun','QuadShotgun','Minigun','Eightball','Railgun','BFG9000MKII','BFG10K'];
 var _tier1WeaponDescription;
@@ -894,7 +894,7 @@ function loadLevel(level)
 		break;
 		case 2:
 		initGame();
-		setSky('games/SKY2YELO.png','games/SKY2MO.png','games/GRY_44D.png');
+		setSky('games/SKY2YELO.png','games/SKY2MO.png','games/floor1.png');
 		_level = 1;
 		_monsterPreferenceMod = [
 		//0 Spiders!
@@ -1006,8 +1006,8 @@ function spawnMonster()
 		rnd = getRandomInt(1,75);
 		if (rnd == 1)
 		{
-			console.log('CurrentSpawnSet: ' + _spawnSet);
-			console.log('MaxSpawnSet: ' + _monsterPreferenceMod.length);
+			//console.log('CurrentSpawnSet: ' + _spawnSet);
+			//console.log('MaxSpawnSet: ' + _monsterPreferenceMod.length);
 			_spawnSet = getRandomInt(0,_monsterPreferenceMod.length - 1);
 		}
 
@@ -1481,7 +1481,7 @@ function deathDrop(rarity,x,y,chance = 100,forceSpawn = false,itemIndex = -1)
 
 	if (itemIndex != -1)  {
 		finalItem = itemIndex
-		console.log('ITEM-INDEX ' + finalItem);
+		//console.log('ITEM-INDEX ' + finalItem);
 	}
 	if (chance >= getRandomInt(0,100) || forceSpawn){
 		switch (finalItem) {
@@ -1807,8 +1807,8 @@ var myGameArea =
 		XScale = XAfter / XBefore;
 		YScale = YAfter / YBefore;
 
-		console.log('NEW WIDTH ' + this.canvas.width + ' / ' + document.body.clientWidth);
-		console.log('NEW HEIGHT ' + this.canvas.height + ' / ' + document.body.clientHeight);
+		//console.log('NEW WIDTH ' + this.canvas.width + ' / ' + document.body.clientWidth);
+		//console.log('NEW HEIGHT ' + this.canvas.height + ' / ' + document.body.clientHeight);
 
 		if (_gameState>0) {
 			_skybox.x = 0;
@@ -2364,10 +2364,10 @@ function component(width, height, color, x, y, type)
 		var otherright = otherobj.x + (otherobj.width / 2);
 		var othertop = otherobj.y - (otherobj.height / 2);
 		var otherbottom = otherobj.y + (otherobj.height / 2);
-		console.log('myleft ' + myleft);
-		console.log('myright ' + myright);
-		console.log('mytop ' + mytop);
-		console.log('mybottom ' + mybottom);
+		//console.log('myleft ' + myleft);
+		//console.log('myright ' + myright);
+		//console.log('mytop ' + mytop);
+		//console.log('mybottom ' + mybottom);
 		var crash = true;
 		if (mybottom < othertop || mytop > otherbottom || myright < otherleft || myleft > otherright || this.isDead == true || otherobj.isDead == true) {
 			crash = false;
@@ -2504,7 +2504,7 @@ function callAirdrop()
 	{
 		return;
 	}
-	console.log(_shopItem);
+	//console.log(_shopItem);
 	var totalItem = 0;
 	for (var i = 0; i < _shopItem.length; i++) {
 		if (Number(_shopItem[i]) > 0)
@@ -2512,7 +2512,7 @@ function callAirdrop()
 			totalItem += 1;
 		}
 	}
-	console.log(totalItem);
+	//console.log(totalItem);
 	playsound('games/FLYBYCLO.mp3',SOUND_CHANNEL_FLYBY);
 	dropship = new specialEffect(136, 51,'games/dropship.png', myGameArea.canvas.width + 32, 64, 'image');
 	dropship.spawnInterval = myGameArea.canvas.width / ((totalItem + 1)*12);
@@ -6555,7 +6555,7 @@ function updateGameArea()
 				}
 				if (hasItem)
 				{
-					console.log('--Airdrop Begin--')
+					//console.log('--Airdrop Begin--')
 					callAirdrop();
 				} else {
 					myMessage.text = 'No Item in shop!';
@@ -6801,8 +6801,8 @@ function updateGameArea()
 								shop = _shopItem;
 								localStorage.shop = shop;
 								//localStorage.shop[_shopItemIndex[i]] = Number(localStorage.shop[_shopItemIndex[i]]) - 1;
-								console.log(_shopItem);
-								console.log('DROPSHIP.ITEM - '+ i);
+								//console.log(_shopItem);
+								//console.log('DROPSHIP.ITEM - '+ i);
 								spawnItem(dropship.x,dropship.y,i);
 
 								dropship.nextitem = i + 1;		
@@ -7030,8 +7030,8 @@ function updateGameArea()
 							}
 							_cursorOffset = _selectedMenu * _skullStep;	
 						}
-						console.log('selected_level  ' + _selectLevel);
-						console.log('selected_menu   ' + _selectedMenu);
+						//console.log('selected_level  ' + _selectLevel);
+						//console.log('selected_menu   ' + _selectedMenu);
 					}
 				}
 				else if (myGameArea.keys && (myGameArea.keys[40] || myGameArea.keys[83])) 
@@ -7073,8 +7073,8 @@ function updateGameArea()
 							}
 							_cursorOffset = _selectedMenu * _skullStep;	
 						}
-						console.log('selected_level  ' + _selectLevel);
-						console.log('selected_menu   ' + _selectedMenu);
+						//console.log('selected_level  ' + _selectLevel);
+						//console.log('selected_menu   ' + _selectedMenu);
 					}
 				}
 				else {
@@ -7360,7 +7360,7 @@ function updateGameArea()
 										{upgrade[i] = 0}
 								}
 								localStorage.upgrade = upgrade;
-								console.log(localStorage.upgrade);
+								//console.log(localStorage.upgrade);
 							} else {
 								interface_list[4].text = 'Not enough money!';
 								interface_list[4].color = '#ff0000';
@@ -7380,7 +7380,7 @@ function updateGameArea()
 									{upgrade[i] = 0}
 							}
 							localStorage.upgrade = upgrade;	
-							console.log(localStorage.upgrade);	
+							//console.log(localStorage.upgrade);	
 						}
 
 					}
